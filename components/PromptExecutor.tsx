@@ -13,6 +13,7 @@ interface PromptExecutorProps {
     content: string;
   };
   className?: string;
+  autoExpand?: boolean;
 }
 
 interface OrgProfile {
@@ -23,8 +24,8 @@ interface OrgProfile {
   customFields?: Record<string, string>;
 }
 
-export function PromptExecutor({ promptId, prompt, className = "" }: PromptExecutorProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+export function PromptExecutor({ promptId, prompt, className = "", autoExpand = false }: PromptExecutorProps) {
+  const [isExpanded, setIsExpanded] = useState(autoExpand);
   const [isExecuting, setIsExecuting] = useState(false);
   const [situation, setSituation] = useState("");
   const [selectedComplexity, setSelectedComplexity] = useState<"low" | "medium" | "high">("medium");
@@ -101,7 +102,7 @@ export function PromptExecutor({ promptId, prompt, className = "" }: PromptExecu
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              Execute This Prompt
+              Get Started
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
               Generate customized content with your organization's context
@@ -116,7 +117,7 @@ export function PromptExecutor({ promptId, prompt, className = "" }: PromptExecu
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
                     d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Get Started
+            Start Now
           </button>
         </div>
       </div>
@@ -126,21 +127,23 @@ export function PromptExecutor({ promptId, prompt, className = "" }: PromptExecu
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-            Execute: {prompt.title}
-          </h2>
-          <button
-            onClick={() => setIsExpanded(false)}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+      {!autoExpand && (
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              Get Started
+            </h2>
+            <button
+              onClick={() => setIsExpanded(false)}
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="p-6 space-y-6">
         {/* Organization Profile */}

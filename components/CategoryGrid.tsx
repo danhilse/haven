@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
+import Link from "next/link";
 
 interface CategoryGridProps {
   className?: string;
@@ -264,9 +265,12 @@ function TemplatesStep({ category, subcategory }: TemplatesStepProps) {
                 </span>
               )}
             </div>
-            <button className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline">
+            <Link 
+              href={`/prompt/${prompt._id}`}
+              className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
+            >
               Start this conversation →
-            </button>
+            </Link>
           </div>
         ))}
       </div>

@@ -38,6 +38,15 @@ This is a full-stack Next.js application using Convex as the backend database an
 `.cursor/rules/convex_rules.mdc` contains our rules for building Convex projects.
 If you need help, use web search to find the relevant information on the latest Convex documentation.
 
+## Templates
+Templates are stored in the `context/pages_nonprofit_ai_templates` directory as markdown files. We will need to migrate them to the Convex database.
+
+## Design
+Use shadcn. Keep in mind that the package is not shadcn/ui, it's just shadcn now.
+
+## Copywriting
+Use the copy style guide in `context/COPY_STYLE_GUIDE.md` for all copywriting.
+
 ### Function Syntax
 Always use the new function syntax from `.cursor/rules/convex_rules.mdc`:
 ```typescript
@@ -69,11 +78,3 @@ The app demonstrates a simple number storage system:
 - Convex URL configured in `NEXT_PUBLIC_CONVEX_URL` environment variable
 - ConvexClientProvider handles client-side connection
 
-## Templates
-Templates are stored in the `context/pages_nonprofit_ai_templates` directory as markdown files. We will need to migrate them to the Convex database.
-
-## Design
-Use shadcn. Keep in mind that the package is not shadcn/ui, it's just shadcn now.
-
-## Copywriting
-Use the copy style guide in `context/COPY_STYLE_GUIDE.md` for all copywriting.
