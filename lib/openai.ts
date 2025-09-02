@@ -34,6 +34,14 @@ export interface GenerateResponse {
   };
 }
 
+export interface ParsedQuery {
+  searchTerms: string[];
+  context: string;
+  category?: string;
+  tags?: string[];
+  intentType: 'fundraising' | 'communication' | 'marketing' | 'advocacy' | 'volunteer' | 'general';
+}
+
 // Different configs based on prompt complexity
 export const getGPT5Config = (complexity: string): GPT5Config => {
   switch (complexity) {
@@ -253,6 +261,99 @@ export async function generatePromptOutputDirect({
 
   } catch (error) {
     console.error('Direct GPT-5 API error:', error);
+    throw error;
+  }
+}
+
+// Parse semantic query using a lightweight LLM call
+export async function parseSemanticQuery(userQuery: string): Promise<ParsedQuery> {
+  const systemPrompt = `You are a query parser for nonprofit communication templates. Extract key information from the user's natural language description.
+
+Return a JSON object with:
+- searchTerms: array of 3-5 key search terms/phrases
+- context: cleaned version of the original query (1-2 sentences)
+- category: one of "fundraising", "communication", "marketing", "advocacy", "volunteer", "general" 
+- tags: array of relevant tags like ["donor", "email", "thank-you", "annual", "gala"]
+- intentType: the main category this request falls into
+
+Focus on extracting the communication purpose, audience, and context.`;
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `Parse this query: "${userQuery}"` }
+        ],
+        max_tokens: 300,
+        temperature: 0.3,
+        response_format: { type: "json_object" }
+      })
+    });
+
+    if (!response.ok) {
+      console.error('Query parsing failed, using fallback');
+      // Fallback parsing
+      return {
+        searchTerms: userQuery.split(' ').filter(word => word.length > 3).slice(0, 5),
+        context: userQuery,
+        intentType: 'general'
+      };
+    }
+
+    const data = await response.json();
+    const parsed = JSON.parse(data.choices[0].message.content);
+    
+    return {
+      searchTerms: parsed.searchTerms || [userQuery],
+      context: parsed.context || userQuery,
+      category: parsed.category,
+      tags: parsed.tags,
+      intentType: parsed.intentType || 'general'
+    };
+
+  } catch (error) {
+    console.error('Query parsing error:', error);
+    // Fallback parsing
+    return {
+      searchTerms: userQuery.split(' ').filter(word => word.length > 3).slice(0, 5),
+      context: userQuery,
+      intentType: 'general'
+    };
+  }
+}
+
+// Generate embeddings for text using OpenAI's embedding model
+export async function generateEmbedding(text: string): Promise<number[]> {
+  try {
+    const response = await fetch('https://api.openai.com/v1/embeddings', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'text-embedding-3-small', // 384 dimensions to match schema
+        input: text,
+        encoding_format: 'float'
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Embedding API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.data[0].embedding;
+
+  } catch (error) {
+    console.error('Embedding generation error:', error);
     throw error;
   }
 }

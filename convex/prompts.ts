@@ -331,6 +331,158 @@ export const getPromptByTitleAndComplexity = query({
   },
 });
 
+// Semantic search using vector similarity
+export const semanticSearch = action({
+  args: {
+    query: v.string(),
+    limit: v.optional(v.number()),
+    filters: v.optional(v.object({
+      category: v.optional(v.string()),
+      tags: v.optional(v.array(v.string()))
+    }))
+  },
+  returns: v.object({
+    results: v.array(v.object({
+      _id: v.id("prompts"),
+      _creationTime: v.number(),
+      title: v.string(),
+      description: v.string(),
+      tags: v.array(v.string()),
+      category: v.string(),
+      subcategory: v.string(),
+      similarity: v.number(),
+    })),
+    parsedQuery: v.object({
+      searchTerms: v.array(v.string()),
+      context: v.string(),
+      category: v.optional(v.string()),
+      tags: v.optional(v.array(v.string())),
+      intentType: v.string(),
+    })
+  }),
+  handler: async (ctx, args) => {
+    const { parseSemanticQuery, generateEmbedding } = await import("../lib/openai");
+    
+    // 1. Parse the semantic query using LLM
+    const parsedQuery = await parseSemanticQuery(args.query);
+    
+    // 2. Generate embedding for the parsed context
+    const queryEmbedding = await generateEmbedding(parsedQuery.context);
+    
+    // 3. Perform vector search
+    const searchResults = await ctx.vectorSearch("prompts", "by_embedding", {
+      vector: queryEmbedding,
+      limit: args.limit ?? 20,
+    });
+    
+    // 4. Group by title and pick medium complexity variant (or first available)
+    const uniquePrompts = new Map<string, any>();
+    
+    searchResults.forEach(result => {
+      const doc = result as any; // Type assertion for full document
+      const existing = uniquePrompts.get(doc.title);
+      if (!existing || doc.complexity === 'medium' || 
+          (existing.complexity !== 'medium' && doc.complexity === 'high')) {
+        uniquePrompts.set(doc.title, {
+          ...doc,
+          similarity: result._score
+        });
+      }
+    });
+    
+    // 5. Return results with similarity scores
+    const results = Array.from(uniquePrompts.values()).map(prompt => ({
+      _id: prompt._id,
+      _creationTime: prompt._creationTime,
+      title: prompt.title,
+      description: prompt.description,
+      tags: prompt.tags,
+      category: prompt.category,
+      subcategory: prompt.subcategory,
+      similarity: prompt.similarity,
+    }));
+    
+    return {
+      results,
+      parsedQuery
+    };
+  },
+});
+
+// Generate and store embeddings for all prompts (utility function)
+export const generateAllEmbeddings = action({
+  args: { batchSize: v.optional(v.number()) },
+  returns: v.object({
+    processed: v.number(),
+    errors: v.number(),
+  }),
+  handler: async (ctx, args) => {
+    const { generateEmbedding } = await import("../lib/openai");
+    
+    // Get all prompts without embeddings
+    const allPrompts = await ctx.runQuery(api.prompts.getAllPromptsForEmbedding, {});
+    const batchSize = args.batchSize ?? 10;
+    let processed = 0;
+    let errors = 0;
+    
+    for (let i = 0; i < allPrompts.length; i += batchSize) {
+      const batch = allPrompts.slice(i, i + batchSize);
+      
+      for (const prompt of batch) {
+        try {
+          // Create text for embedding from title, description, and tags
+          const embeddingText = `${prompt.title}. ${prompt.description}. Tags: ${prompt.tags.join(', ')}. Category: ${prompt.category} ${prompt.subcategory}`;
+          
+          const embedding = await generateEmbedding(embeddingText);
+          
+          await ctx.runMutation(api.prompts.updatePromptEmbedding, {
+            promptId: prompt._id,
+            embedding
+          });
+          
+          processed++;
+          
+          // Small delay to avoid rate limits
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+        } catch (error) {
+          console.error(`Failed to generate embedding for prompt ${prompt._id}:`, error);
+          errors++;
+        }
+      }
+    }
+    
+    return { processed, errors };
+  },
+});
+
+// Get all prompts for embedding generation
+export const getAllPromptsForEmbedding = query({
+  args: {},
+  returns: v.array(v.object({
+    _id: v.id("prompts"),
+    title: v.string(),
+    description: v.string(),
+    tags: v.array(v.string()),
+    category: v.string(),
+    subcategory: v.string(),
+    embedding: v.optional(v.array(v.number())),
+  })),
+  handler: async (ctx) => {
+    const prompts = await ctx.db.query("prompts").collect();
+    
+    return prompts.map(prompt => ({
+      _id: prompt._id,
+      title: prompt.title,
+      description: prompt.description,
+      tags: prompt.tags,
+      category: prompt.category,
+      subcategory: prompt.subcategory,
+      embedding: prompt.embedding,
+    }));
+  },
+});
+
 // Execute a prompt with organization context and situation using GPT-5
 export const executePrompt = action({
   args: {

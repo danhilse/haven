@@ -1,6 +1,6 @@
 "use client";
 
-import { SearchBox } from "../components/SearchBox";
+import { SemanticSearchBox } from "../components/SemanticSearchBox";
 import { CategoryGrid } from "../components/CategoryGrid";
 
 export default function Home() {
@@ -24,13 +24,13 @@ export default function Home() {
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
               Access hundreds of curated prompt templates designed specifically for nonprofit organizations. 
-              Search by topic or browse by category to find the perfect prompts for your needs.
+              Describe your communication needs in natural language to find the perfect templates.
             </p>
             
-            {/* Main Search */}
+            {/* Main Semantic Search */}
             <div className="mb-8">
-              <SearchBox
-                placeholder="Search nonprofit prompt templates..."
+              <SemanticSearchBox
+                placeholder="Describe what you need help with..."
                 className="max-w-2xl mx-auto"
               />
             </div>
@@ -38,16 +38,16 @@ export default function Home() {
             {/* Primary CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="/search"
+                href="/search?semantic=true"
                 className="inline-flex items-center justify-center px-8 py-3 
                           bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg
                           transition-colors duration-200"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-                Search Prompts
+                Smart Search
               </a>
               <a
                 href="#categories"
@@ -58,9 +58,9 @@ export default function Home() {
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                Browse Categories
+                Quick Find
               </a>
             </div>
           </div>
@@ -72,11 +72,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-              Browse by Category
+              Find Templates in 2 Steps
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Explore our organized collection of prompt templates, each designed to help nonprofits 
-              with specific tasks and communications.
+              Browse our colorful collection of specialized template areas. 
+              Pick what you need help with, then find the perfect templates.
             </p>
           </div>
           <CategoryGrid />

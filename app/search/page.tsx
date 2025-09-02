@@ -2,9 +2,10 @@
 
 import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { useQuery } from "convex/react";
+import { useQuery, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { SearchBox } from "../../components/SearchBox";
+import { SemanticSearchBox } from "../../components/SemanticSearchBox";
 import { PromptCard } from "../../components/PromptCard";
 import { FilterSidebar } from "../../components/FilterSidebar";
 import { SearchBreadcrumb } from "../../components/Breadcrumb";
@@ -51,28 +52,59 @@ function SearchHeaderContent() {
 function SearchContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
+  const isSemanticSearch = searchParams.get('semantic') === 'true';
   const [query, setQuery] = useState(initialQuery);
   const [filters, setFilters] = useState<{
     category?: string;
     tags?: string[];
   }>({});
+  const [semanticResults, setSemanticResults] = useState<any>(null);
+  const [isLoadingSemantic, setIsLoadingSemantic] = useState(false);
 
-  // Search prompts with current query and filters
-  const searchResults = useQuery(
+  // Semantic search action
+  const semanticSearch = useAction(api.prompts.semanticSearch);
+
+  // Regular keyword search results
+  const keywordSearchResults = useQuery(
     api.prompts.searchPrompts,
-    query ? {
+    query && !isSemanticSearch ? {
       query,
       filters: Object.keys(filters).length > 0 ? filters : undefined,
       limit: 50
     } : "skip"
   );
 
+  // Handle semantic search
+  useEffect(() => {
+    if (isSemanticSearch && query && query.length > 10) {
+      setIsLoadingSemantic(true);
+      semanticSearch({
+        query,
+        limit: 20,
+        filters: Object.keys(filters).length > 0 ? filters : undefined,
+      }).then(results => {
+        setSemanticResults(results);
+        setIsLoadingSemantic(false);
+      }).catch(error => {
+        console.error('Semantic search failed:', error);
+        setIsLoadingSemantic(false);
+      });
+    } else if (!isSemanticSearch) {
+      setSemanticResults(null);
+    }
+  }, [query, isSemanticSearch, filters, semanticSearch]);
+
+  // Determine which results to show
+  const searchResults = isSemanticSearch ? 
+    (isLoadingSemantic ? undefined : semanticResults?.results) : 
+    keywordSearchResults;
+
   // Get categories for filter dropdown
   const categories = useQuery(api.prompts.getCategories);
 
   const handleSearch = (newQuery: string) => {
     setQuery(newQuery);
-    // Update URL without navigation
+    // Update URL without navigation - preserve semantic parameter
     const url = new URL(window.location.href);
     url.searchParams.set('q', newQuery);
     window.history.replaceState({}, '', url);
@@ -109,19 +141,34 @@ function SearchContent() {
       <div className="flex-1 space-y-6">
         {/* Search Box */}
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-          <SearchBox
-            initialValue={query}
-            onSearch={handleSearch}
-            placeholder="Search for nonprofit prompt templates..."
-            showLiveSearch={true}
-            debounceMs={400}
-          />
+          {isSemanticSearch ? (
+            <SemanticSearchBox
+              initialValue={query}
+              onSearch={handleSearch}
+              placeholder="Describe what you're looking for..."
+              showLiveSearch={true}
+              debounceMs={600}
+            />
+          ) : (
+            <SearchBox
+              initialValue={query}
+              onSearch={handleSearch}
+              placeholder="Search for nonprofit prompt templates..."
+              showLiveSearch={true}
+              debounceMs={400}
+            />
+          )}
         </div>
 
         {/* Results */}
         <div>
           {query ? (
-            <SearchResults results={searchResults} query={query} />
+            <SearchResults 
+              results={searchResults} 
+              query={query} 
+              isSemanticSearch={isSemanticSearch}
+              parsedQuery={semanticResults?.parsedQuery}
+            />
           ) : (
             <div className="text-center py-16">
               <div className="text-gray-500 dark:text-gray-400">
@@ -143,9 +190,11 @@ function SearchContent() {
   );
 }
 
-function SearchResults({ results, query }: { 
+function SearchResults({ results, query, isSemanticSearch, parsedQuery }: { 
   results: any[] | undefined;
   query: string;
+  isSemanticSearch?: boolean;
+  parsedQuery?: any;
 }) {
   if (results === undefined) {
     return <SearchResultsSkeleton />;
@@ -154,15 +203,43 @@ function SearchResults({ results, query }: {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-          {results.length > 0 
-            ? `Found ${results.length} result${results.length === 1 ? '' : 's'} for "${query}"`
-            : `No results found for "${query}"`
-          }
-        </h2>
+        <div className="flex items-start justify-between">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+            {results.length > 0 
+              ? `Found ${results.length} result${results.length === 1 ? '' : 's'}`
+              : `No results found`
+            }
+          </h2>
+          {isSemanticSearch && (
+            <div className="flex items-center text-sm text-blue-600 dark:text-blue-400">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+              AI-powered search
+            </div>
+          )}
+        </div>
+        
+        {parsedQuery && (
+          <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
+              <strong>Understanding:</strong> {parsedQuery.context}
+            </p>
+            {parsedQuery.category && (
+              <p className="text-xs text-blue-600 dark:text-blue-300">
+                Category: {parsedQuery.category} • Intent: {parsedQuery.intentType}
+              </p>
+            )}
+          </div>
+        )}
+        
         {results.length === 0 && (
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-            Try adjusting your search terms or clearing the filters.
+            {isSemanticSearch 
+              ? "Try describing your needs differently or use more specific details about your situation."
+              : "Try adjusting your search terms or clearing the filters."
+            }
           </p>
         )}
       </div>
