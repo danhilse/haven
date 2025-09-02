@@ -1,0 +1,523 @@
+{
+  "testDate": "2025-09-02T19:11:54.159Z",
+  "promptsProcessed": 4,
+  "uniqueVariables": 26,
+  "variablesEnhanced": 10,
+  "aiConfidence": 0.95,
+  "aiError": null,
+  "extractedVariables": [
+    {
+      "name": "PROGRAM_NAME",
+      "basePattern": "PROGRAM_NAME",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Programs & Services",
+      "usageCount": 2,
+      "promptFiles": [
+        "Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md",
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "ORGANIZATION_NAME",
+      "basePattern": "ORGANIZATION_NAME",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Organization Identity",
+      "usageCount": 4,
+      "promptFiles": [
+        "Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md",
+        "Sort_and_Scan/Quality_Assessment_&_Scoring/Program_proposal_evaluation_and_feedback_medium.md",
+        "Answer_and_Assist/FAQ_&_Knowledge_Base_Responses/Board_member_questions_about_governance_high.md",
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "MISSION_STATEMENT",
+      "basePattern": "MISSION_STATEMENT",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Mission & Values",
+      "usageCount": 1,
+      "promptFiles": [
+        "Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md"
+      ]
+    },
+    {
+      "name": "CORE_VALUE",
+      "basePattern": "CORE_VALUE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Mission & Values",
+      "usageCount": 1,
+      "promptFiles": [
+        "Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md"
+      ]
+    },
+    {
+      "name": "KEY_QUALITY_#",
+      "basePattern": "KEY_QUALITY",
+      "isNumbered": true,
+      "maxNumber": 2,
+      "category": "Mission & Values",
+      "usageCount": 1,
+      "promptFiles": [
+        "Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md"
+      ]
+    },
+    {
+      "name": "PROPOSAL_TEXT",
+      "basePattern": "PROPOSAL_TEXT",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Sort_and_Scan/Quality_Assessment_&_Scoring/Program_proposal_evaluation_and_feedback_medium.md"
+      ]
+    },
+    {
+      "name": "EVALUATION_CRITERIA",
+      "basePattern": "EVALUATION_CRITERIA",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Sort_and_Scan/Quality_Assessment_&_Scoring/Program_proposal_evaluation_and_feedback_medium.md"
+      ]
+    },
+    {
+      "name": "CLIENT_NAME",
+      "basePattern": "CLIENT_NAME",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "People & Contacts",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "APPOINTMENT_TYPE",
+      "basePattern": "APPOINTMENT_TYPE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "DATE",
+      "basePattern": "DATE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Dates & Times",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "TIME",
+      "basePattern": "TIME",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Dates & Times",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "LOCATION",
+      "basePattern": "LOCATION",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "REQUIRED_DOCUMENTS",
+      "basePattern": "REQUIRED_DOCUMENTS",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "MEETING_PURPOSE",
+      "basePattern": "MEETING_PURPOSE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Events & Activities",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "DONOR_NAME",
+      "basePattern": "DONOR_NAME",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "People & Contacts",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "ORGANIZATION_ROLE",
+      "basePattern": "ORGANIZATION_ROLE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Organization Identity",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "CALENDLY_LINK",
+      "basePattern": "CALENDLY_LINK",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "STAFF_NAME",
+      "basePattern": "STAFF_NAME",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "People & Contacts",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "STAFF_TITLE",
+      "basePattern": "STAFF_TITLE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "People & Contacts",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "RELEVANT_DOCUMENT",
+      "basePattern": "RELEVANT_DOCUMENT",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "PHONE_NUMBER",
+      "basePattern": "PHONE_NUMBER",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "People & Contacts",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "DURATION",
+      "basePattern": "DURATION",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "DISCUSSION_TOPIC",
+      "basePattern": "DISCUSSION_TOPIC",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "PROMISED_RESOURCES",
+      "basePattern": "PROMISED_RESOURCES",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "ACTION_ITEMS",
+      "basePattern": "ACTION_ITEMS",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "DEADLINE",
+      "basePattern": "DEADLINE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Dates & Times",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    }
+  ],
+  "enhancedVariables": [
+    {
+      "name": "PROGRAM_NAME",
+      "description": "The official name of the program or service offered by the nonprofit that beneficiaries, staff, and partners will recognize.",
+      "examples": [
+        "Youth STEM Mentorship Program",
+        "Weekend Food Pantry Delivery",
+        "Transitional Housing for Veterans"
+      ],
+      "category": "Programs & Services",
+      "suggestedInputType": "text",
+      "validationRules": [
+        "required",
+        "maxLength:100",
+        "noSpecialChars: allow letters, numbers, spaces, hyphens, ampersands"
+      ]
+    },
+    {
+      "name": "ORGANIZATION_NAME",
+      "description": "The legal or public-facing name of the nonprofit organization using the template (used in communications, headers, and formal documents).",
+      "examples": [
+        "Harbor Community Services",
+        "Bright Futures Foundation",
+        "Citywide Volunteer Network"
+      ],
+      "category": "Organization Identity",
+      "suggestedInputType": "text",
+      "validationRules": [
+        "required",
+        "maxLength:120",
+        "noLeadingOrTrailingWhitespace"
+      ]
+    },
+    {
+      "name": "MISSION_STATEMENT",
+      "description": "A concise statement summarizing the nonprofit's purpose, primary activities, and intended impact used to align messaging and proposals.",
+      "examples": [
+        "To empower low-income families through access to affordable childcare and early education.",
+        "To reduce neighborhood food insecurity by coordinating community-driven distribution and nutrition education.",
+        "To connect formerly incarcerated individuals to employment training and placement services."
+      ],
+      "category": "Mission & Values",
+      "suggestedInputType": "textarea",
+      "validationRules": [
+        "required",
+        "minLength:20",
+        "maxLength:500"
+      ]
+    },
+    {
+      "name": "CORE_VALUE",
+      "description": "A single core organizational value (e.g., equity, transparency) that guides decision-making and program design; multiple CORE_VALUE entries may be used if needed.",
+      "examples": [
+        "Equity: ensuring fair access to services for historically underserved communities.",
+        "Collaboration: partnering with local organizations to increase impact.",
+        "Accountability: using data to measure outcomes and improve programs."
+      ],
+      "category": "Mission & Values",
+      "suggestedInputType": "text",
+      "validationRules": [
+        "required",
+        "maxLength:100"
+      ]
+    },
+    {
+      "name": "KEY_QUALITY_#",
+      "description": "A notable quality or attribute expected in applicants/participants or that describes a program outcome; this is a numbered field (e.g., KEY_QUALITY_1, KEY_QUALITY_2) to allow multiple entries.",
+      "examples": [
+        "KEY_QUALITY_1: Demonstrated commitment to community service",
+        "KEY_QUALITY_2: Basic literacy and numeracy skills",
+        "KEY_QUALITY_3: Ability to attend weekly workshops (for programs supporting attendance)"
+      ],
+      "category": "Mission & Values",
+      "suggestedInputType": "text",
+      "validationRules": [
+        "required",
+        "maxLength:120",
+        "pattern:^[\\w\\s\\-\\,\\:\\;\\.]{3,120}$",
+        "instancesAllowed: up to 2 (per maxNumber) — accept KEY_QUALITY_1..KEY_QUALITY_2"
+      ]
+    },
+    {
+      "name": "PROPOSAL_TEXT",
+      "description": "Full narrative of a program or funding proposal submitted for review, used for scoring, feedback, or synthesis.",
+      "examples": [
+        "Proposal to expand our after-school tutoring across three additional schools, including budget and staffing plans.",
+        "A pilot project to deliver mobile health clinics to rural neighborhoods focusing on maternal care and immunizations.",
+        "Request for funding to scale our workforce development program with a six-month paid internship component."
+      ],
+      "category": "Program Proposals & Assessments",
+      "suggestedInputType": "textarea",
+      "validationRules": [
+        "required",
+        "minLength:200",
+        "maxLength:8000",
+        "allowRichText:false"
+      ]
+    },
+    {
+      "name": "EVALUATION_CRITERIA",
+      "description": "Structured list or description of the criteria and scoring rubric used to evaluate proposals, applications, or program performance.",
+      "examples": [
+        "Criteria: Impact (40%), Feasibility (30%), Cost-effectiveness (20%), Sustainability (10%).",
+        "Evaluation points include: clarity of goals, evidence of need, realistic budget, and measurable outcomes.",
+        "Scoring rubric with 1–5 ratings across relevance, innovation, community engagement, and scalability."
+      ],
+      "category": "Program Proposals & Assessments",
+      "suggestedInputType": "textarea",
+      "validationRules": [
+        "required",
+        "maxLength:2000",
+        "preferStructuredList: true (bullet or numbered)"
+      ]
+    },
+    {
+      "name": "CLIENT_NAME",
+      "description": "The full name of an individual client, participant, or service recipient relevant to appointments and case management records.",
+      "examples": [
+        "Maria Gonzalez",
+        "Jordan Lee",
+        "Samuel O. Thompson"
+      ],
+      "category": "People & Contacts",
+      "suggestedInputType": "text",
+      "validationRules": [
+        "required",
+        "maxLength:80",
+        "noDigits",
+        "noSpecialCharsExcept: hyphen, apostrophe, period"
+      ]
+    },
+    {
+      "name": "APPOINTMENT_TYPE",
+      "description": "The nature or category of an appointment (e.g., intake, follow-up, counseling) to help route and prepare staff and resources.",
+      "examples": [
+        "Intake Assessment (new client)",
+        "Monthly Case Management Check-in",
+        "Vaccination Clinic Slot"
+      ],
+      "category": "Service Delivery & Scheduling",
+      "suggestedInputType": "select",
+      "validationRules": [
+        "required",
+        "optionsSuggested: [\"Intake Assessment\",\"Follow-up\",\"Counseling\",\"Workshop\",\"Clinic\"]",
+        "allowCustomOption:true",
+        "maxLength:100"
+      ]
+    },
+    {
+      "name": "DATE",
+      "description": "A calendar date associated with activities like appointments, program start dates, deadlines, or event dates; should be provided in a standard date format.",
+      "examples": [
+        "2025-11-15",
+        "2025-07-01",
+        "2026-01-10"
+      ],
+      "category": "Dates & Times",
+      "suggestedInputType": "date",
+      "validationRules": [
+        "required",
+        "format:YYYY-MM-DD",
+        "notInPast: optional (context-dependent — e.g., appointment dates must be today or future)",
+        "timezoneAware: store with timezone when possible"
+      ]
+    }
+  ],
+  "additionalDocuments": [],
+  "promptResults": [
+    {
+      "filePath": "context/pages_nonprofit_ai_templates/Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md",
+      "variableCount": 5,
+      "variables": [
+        "PROGRAM_NAME",
+        "ORGANIZATION_NAME",
+        "MISSION_STATEMENT",
+        "CORE_VALUE",
+        "KEY_QUALITY_#"
+      ]
+    },
+    {
+      "filePath": "context/pages_nonprofit_ai_templates/Sort_and_Scan/Quality_Assessment_&_Scoring/Program_proposal_evaluation_and_feedback_medium.md",
+      "variableCount": 3,
+      "variables": [
+        "ORGANIZATION_NAME",
+        "PROPOSAL_TEXT",
+        "EVALUATION_CRITERIA"
+      ]
+    },
+    {
+      "filePath": "context/pages_nonprofit_ai_templates/Answer_and_Assist/FAQ_&_Knowledge_Base_Responses/Board_member_questions_about_governance_high.md",
+      "variableCount": 1,
+      "variables": [
+        "ORGANIZATION_NAME"
+      ]
+    },
+    {
+      "filePath": "context/pages_nonprofit_ai_templates/Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md",
+      "variableCount": 21,
+      "variables": [
+        "ORGANIZATION_NAME",
+        "CLIENT_NAME",
+        "APPOINTMENT_TYPE",
+        "DATE",
+        "TIME",
+        "LOCATION",
+        "REQUIRED_DOCUMENTS",
+        "MEETING_PURPOSE",
+        "DONOR_NAME",
+        "ORGANIZATION_ROLE",
+        "PROGRAM_NAME",
+        "CALENDLY_LINK",
+        "STAFF_NAME",
+        "STAFF_TITLE",
+        "RELEVANT_DOCUMENT",
+        "PHONE_NUMBER",
+        "DURATION",
+        "DISCUSSION_TOPIC",
+        "PROMISED_RESOURCES",
+        "ACTION_ITEMS",
+        "DEADLINE"
+      ]
+    }
+  ]
+}

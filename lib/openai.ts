@@ -1,12 +1,9 @@
-// Note: AI SDK imports commented out until packages are properly installed
-// import { openai } from '@ai-sdk/openai';
-// import { generateText } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
+import { generateText } from 'ai';
 
 // GPT-5 configuration types
 export interface GPT5Config {
-  verbosity: 'low' | 'medium' | 'high';
-  reasoning_effort: 'minimal' | 'standard' | 'extensive';
-  max_output_tokens: number;
+  maxTokens: number;
   temperature: number;
 }
 
@@ -47,24 +44,18 @@ export const getGPT5Config = (complexity: string): GPT5Config => {
   switch (complexity) {
     case 'high':
       return {
-        verbosity: 'high',
-        reasoning_effort: 'extensive',
-        max_output_tokens: 4000,
+        maxTokens: 4000,
         temperature: 0.3,
       };
     case 'medium':
       return {
-        verbosity: 'medium',
-        reasoning_effort: 'standard',
-        max_output_tokens: 2000,
+        maxTokens: 2000,
         temperature: 0.4,
       };
     case 'low':
     default:
       return {
-        verbosity: 'low',
-        reasoning_effort: 'minimal',
-        max_output_tokens: 1000,
+        maxTokens: 1000,
         temperature: 0.5,
       };
   }
@@ -134,79 +125,31 @@ export async function generatePromptOutput({
   const systemPrompt = buildSystemPrompt(orgProfile, complexity);
   const userPrompt = interpolatePrompt(prompt, situation);
 
+  // Use Vercel AI SDK with OpenAI provider; target GPT-5 explicitly
+  const openai = createOpenAI({ apiKey: process.env.OPENAI_KEY || process.env.OPENAI_API_KEY });
   try {
-    // Use direct OpenAI API call for now (Vercel AI SDK commented out)
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-5',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        verbosity: config.verbosity,
-        reasoning_effort: config.reasoning_effort,
-        max_output_tokens: config.max_output_tokens,
-        temperature: config.temperature,
-      })
+    const { text, usage } = await generateText({
+      model: openai('gpt-5'),
+      system: systemPrompt,
+      prompt: userPrompt,
+      maxTokens: config.maxTokens,
+      temperature: config.temperature,
     });
 
-    if (!response.ok) {
-      // Try fallback to GPT-4 if GPT-5 fails
-      console.log('GPT-5 failed, falling back to GPT-4...');
-      const fallbackResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4-turbo',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }
-          ],
-          max_tokens: config.max_output_tokens,
-          temperature: config.temperature,
-        })
-      });
-
-      if (!fallbackResponse.ok) {
-        throw new Error(`OpenAI API error: ${fallbackResponse.status} ${fallbackResponse.statusText}`);
-      }
-
-      const fallbackData = await fallbackResponse.json();
-      return {
-        output: fallbackData.choices[0].message.content,
-        metadata: {
-          model: 'gpt-4-turbo',
-          tokens: fallbackData.usage?.total_tokens || 0,
-          complexity,
-          verbosity: config.verbosity,
-          reasoning_effort: config.reasoning_effort,
-        }
-      };
-    }
-
-    const data = await response.json();
     return {
-      output: data.choices[0].message.content,
+      output: text,
       metadata: {
         model: 'gpt-5',
-        tokens: data.usage?.total_tokens || 0,
+        tokens: usage.totalTokens ?? 0,
         complexity,
-        verbosity: config.verbosity,
-        reasoning_effort: config.reasoning_effort,
+        verbosity: complexity,
+        reasoning_effort: 'standard',
       }
     };
-
   } catch (error) {
-    console.error('OpenAI API error:', error);
-    throw error;
+    // Surface a precise error so callers know GPT-5 was not used
+    console.error('GPT-5 generation error (AI SDK):', error);
+    throw error instanceof Error ? error : new Error('GPT-5 generation failed');
   }
 }
 
@@ -222,7 +165,7 @@ export async function generatePromptOutputDirect({
   const userPrompt = interpolatePrompt(prompt, situation);
 
   try {
-    // Direct fetch to OpenAI API with GPT-5 specific parameters
+    // Direct fetch to OpenAI API targeting gpt-5 (no fallback)
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -235,10 +178,8 @@ export async function generatePromptOutputDirect({
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        verbosity: config.verbosity,
-        reasoning_effort: config.reasoning_effort,
-        max_output_tokens: config.max_output_tokens,
-        temperature: config.temperature,
+        max_tokens: config.maxTokens,
+        temperature: config.temperature
       })
     });
 
@@ -254,8 +195,8 @@ export async function generatePromptOutputDirect({
         model: 'gpt-5',
         tokens: data.usage?.total_tokens || 0,
         complexity,
-        verbosity: config.verbosity,
-        reasoning_effort: config.reasoning_effort,
+        verbosity: complexity,
+        reasoning_effort: 'standard',
       }
     };
 
@@ -357,4 +298,163 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     console.error('Embedding generation error:', error);
     throw error;
   }
+}
+
+// Interface for variable metadata enhancement
+export interface VariableEnhancementRequest {
+  variables: Array<{
+    name: string;
+    basePattern: string;
+    isNumbered: boolean;
+    maxNumber?: number;
+    category: string;
+    usageExamples: string[]; // Context from prompts where it's used
+  }>;
+  promptContext?: string; // Additional context about the prompts being processed
+}
+
+export interface VariableEnhancementResponse {
+  enhancedVariables: Array<{
+    name: string;
+    description: string;
+    examples: string[];
+    category: string;
+    suggestedInputType: 'text' | 'textarea' | 'select' | 'number' | 'date' | 'email' | 'phone';
+    validationRules?: string[];
+  }>;
+  additionalDocuments?: string[];
+  confidence: number;
+}
+
+// Enhanced variable metadata generation using GPT-5 with 2025 parameters
+export async function enhanceVariableMetadata({
+  variables,
+  promptContext
+}: VariableEnhancementRequest): Promise<VariableEnhancementResponse> {
+  const systemPrompt = `You are an expert in nonprofit communication templates and variable metadata generation. Your task is to analyze template variables and generate useful descriptions, examples, and metadata.
+
+For each variable provided, generate:
+1. A clear, concise description (1-2 sentences) explaining what this variable represents
+2. Three realistic examples that a nonprofit might use
+3. Suggest the most appropriate input type for forms
+4. Any validation rules that should apply
+
+Focus on nonprofit-specific context. Variables should reflect real organizational needs like donor management, program delivery, volunteer coordination, etc.
+
+IMPORTANT: For numbered variables like KEY_QUALITY_#, describe the base concept and note that multiple instances (1, 2, 3, etc.) are expected.
+
+Return valid JSON only.`;
+
+  const userPrompt = `Analyze these nonprofit template variables and provide metadata:
+
+${JSON.stringify({ variables, promptContext }, null, 2)}
+
+Return a JSON object with this structure:
+{
+  "enhancedVariables": [
+    {
+      "name": "VARIABLE_NAME",
+      "description": "Clear description of what this variable represents",
+      "examples": ["Example 1", "Example 2", "Example 3"],
+      "category": "Confirmed or refined category",
+      "suggestedInputType": "text|textarea|select|number|date|email|phone",
+      "validationRules": ["Optional validation rules"]
+    }
+  ],
+  "additionalDocuments": ["Only if specific documents are clearly needed"],
+  "confidence": 0.95
+}`;
+
+  try {
+    // Use GPT-5 with new 2025 parameters for enhanced metadata generation
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-5',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        max_tokens: 2000,
+        temperature: 0.3,
+        response_format: { type: "json_object" },
+        // New GPT-5 2025 parameters
+        reasoning: { effort: "medium" }, // Balanced reasoning for good quality
+        text: { verbosity: "medium" } // Medium verbosity for detailed but not excessive descriptions
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`GPT-5 API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const result = JSON.parse(data.choices[0].message.content);
+
+    return {
+      enhancedVariables: result.enhancedVariables || [],
+      additionalDocuments: result.additionalDocuments || [],
+      confidence: result.confidence || 0.8
+    };
+
+  } catch (error) {
+    console.error('Variable enhancement error:', error);
+    // Fallback with basic metadata if AI fails
+    const fallbackVariables = variables.map(variable => ({
+      name: variable.name,
+      description: `${variable.name.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())} value for nonprofit template`,
+      examples: ['Sample value 1', 'Sample value 2', 'Sample value 3'],
+      category: variable.category,
+      suggestedInputType: 'text' as const
+    }));
+
+    return {
+      enhancedVariables: fallbackVariables,
+      additionalDocuments: [],
+      confidence: 0.3
+    };
+  }
+}
+
+// Batch enhance variables in smaller groups to avoid token limits
+export async function batchEnhanceVariables(
+  allVariables: Array<{
+    name: string;
+    basePattern: string;
+    isNumbered: boolean;
+    maxNumber?: number;
+    category: string;
+    usageExamples: string[];
+  }>,
+  batchSize: number = 10
+): Promise<VariableEnhancementResponse[]> {
+  const results: VariableEnhancementResponse[] = [];
+  
+  for (let i = 0; i < allVariables.length; i += batchSize) {
+    const batch = allVariables.slice(i, i + batchSize);
+    console.log(`Processing variable batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(allVariables.length/batchSize)}`);
+    
+    try {
+      const result = await enhanceVariableMetadata({
+        variables: batch,
+        promptContext: `Processing batch ${Math.floor(i/batchSize) + 1} of ${Math.ceil(allVariables.length/batchSize)} variable batches for nonprofit prompt templates`
+      });
+      
+      results.push(result);
+      
+      // Small delay between batches to be respectful to the API
+      if (i + batchSize < allVariables.length) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    } catch (error) {
+      console.error(`Error processing batch ${Math.floor(i/batchSize) + 1}:`, error);
+      // Continue with other batches even if one fails
+    }
+  }
+  
+  return results;
 }

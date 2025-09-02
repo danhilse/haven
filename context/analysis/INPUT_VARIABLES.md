@@ -5169,6 +5169,12 @@ Variables are listed in order of frequency of use across all templates.
 
 **Files:**
 - Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md
+### 714. KEY_QUALITY_1
+- **Occurrences**: 1
+- **Used in**: 1 template
+
+**Files:**
+- Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md
 
 ### 715. KEY_QUALITY_2
 - **Occurrences**: 1

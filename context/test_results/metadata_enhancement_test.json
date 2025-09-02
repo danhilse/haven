@@ -1,0 +1,362 @@
+{
+  "testDate": "2025-09-02T18:43:04.300Z",
+  "promptsProcessed": 4,
+  "uniqueVariables": 26,
+  "categoryStats": {
+    "Programs & Services": 1,
+    "Organization Identity": 2,
+    "Mission & Values": 3,
+    "Other": 11,
+    "People & Contacts": 5,
+    "Dates & Times": 3,
+    "Events & Activities": 1
+  },
+  "variables": [
+    {
+      "name": "PROGRAM_NAME",
+      "basePattern": "PROGRAM_NAME",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Programs & Services",
+      "usageCount": 2,
+      "promptFiles": [
+        "Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md",
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "ORGANIZATION_NAME",
+      "basePattern": "ORGANIZATION_NAME",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Organization Identity",
+      "usageCount": 4,
+      "promptFiles": [
+        "Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md",
+        "Sort_and_Scan/Quality_Assessment_&_Scoring/Program_proposal_evaluation_and_feedback_medium.md",
+        "Answer_and_Assist/FAQ_&_Knowledge_Base_Responses/Board_member_questions_about_governance_high.md",
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "MISSION_STATEMENT",
+      "basePattern": "MISSION_STATEMENT",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Mission & Values",
+      "usageCount": 1,
+      "promptFiles": [
+        "Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md"
+      ]
+    },
+    {
+      "name": "CORE_VALUE",
+      "basePattern": "CORE_VALUE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Mission & Values",
+      "usageCount": 1,
+      "promptFiles": [
+        "Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md"
+      ]
+    },
+    {
+      "name": "KEY_QUALITY_#",
+      "basePattern": "KEY_QUALITY",
+      "isNumbered": true,
+      "maxNumber": 2,
+      "category": "Mission & Values",
+      "usageCount": 1,
+      "promptFiles": [
+        "Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md"
+      ]
+    },
+    {
+      "name": "PROPOSAL_TEXT",
+      "basePattern": "PROPOSAL_TEXT",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Sort_and_Scan/Quality_Assessment_&_Scoring/Program_proposal_evaluation_and_feedback_medium.md"
+      ]
+    },
+    {
+      "name": "EVALUATION_CRITERIA",
+      "basePattern": "EVALUATION_CRITERIA",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Sort_and_Scan/Quality_Assessment_&_Scoring/Program_proposal_evaluation_and_feedback_medium.md"
+      ]
+    },
+    {
+      "name": "CLIENT_NAME",
+      "basePattern": "CLIENT_NAME",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "People & Contacts",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "APPOINTMENT_TYPE",
+      "basePattern": "APPOINTMENT_TYPE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "DATE",
+      "basePattern": "DATE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Dates & Times",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "TIME",
+      "basePattern": "TIME",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Dates & Times",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "LOCATION",
+      "basePattern": "LOCATION",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "REQUIRED_DOCUMENTS",
+      "basePattern": "REQUIRED_DOCUMENTS",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "MEETING_PURPOSE",
+      "basePattern": "MEETING_PURPOSE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Events & Activities",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "DONOR_NAME",
+      "basePattern": "DONOR_NAME",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "People & Contacts",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "ORGANIZATION_ROLE",
+      "basePattern": "ORGANIZATION_ROLE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Organization Identity",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "CALENDLY_LINK",
+      "basePattern": "CALENDLY_LINK",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "STAFF_NAME",
+      "basePattern": "STAFF_NAME",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "People & Contacts",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "STAFF_TITLE",
+      "basePattern": "STAFF_TITLE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "People & Contacts",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "RELEVANT_DOCUMENT",
+      "basePattern": "RELEVANT_DOCUMENT",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "PHONE_NUMBER",
+      "basePattern": "PHONE_NUMBER",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "People & Contacts",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "DURATION",
+      "basePattern": "DURATION",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "DISCUSSION_TOPIC",
+      "basePattern": "DISCUSSION_TOPIC",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "PROMISED_RESOURCES",
+      "basePattern": "PROMISED_RESOURCES",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "ACTION_ITEMS",
+      "basePattern": "ACTION_ITEMS",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Other",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    },
+    {
+      "name": "DEADLINE",
+      "basePattern": "DEADLINE",
+      "isNumbered": false,
+      "maxNumber": null,
+      "category": "Dates & Times",
+      "usageCount": 1,
+      "promptFiles": [
+        "Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md"
+      ]
+    }
+  ],
+  "promptResults": [
+    {
+      "filePath": "context/pages_nonprofit_ai_templates/Sort_and_Scan/Application_&_Candidate_Screening/Program_participant_selection_low.md",
+      "variableCount": 5,
+      "variables": [
+        "PROGRAM_NAME",
+        "ORGANIZATION_NAME",
+        "MISSION_STATEMENT",
+        "CORE_VALUE",
+        "KEY_QUALITY_#"
+      ]
+    },
+    {
+      "filePath": "context/pages_nonprofit_ai_templates/Sort_and_Scan/Quality_Assessment_&_Scoring/Program_proposal_evaluation_and_feedback_medium.md",
+      "variableCount": 3,
+      "variables": [
+        "ORGANIZATION_NAME",
+        "PROPOSAL_TEXT",
+        "EVALUATION_CRITERIA"
+      ]
+    },
+    {
+      "filePath": "context/pages_nonprofit_ai_templates/Answer_and_Assist/FAQ_&_Knowledge_Base_Responses/Board_member_questions_about_governance_high.md",
+      "variableCount": 1,
+      "variables": [
+        "ORGANIZATION_NAME"
+      ]
+    },
+    {
+      "filePath": "context/pages_nonprofit_ai_templates/Automate_the_Admin/Automated_Communications/Appointment_scheduling_and_calendar_management_high.md",
+      "variableCount": 21,
+      "variables": [
+        "ORGANIZATION_NAME",
+        "CLIENT_NAME",
+        "APPOINTMENT_TYPE",
+        "DATE",
+        "TIME",
+        "LOCATION",
+        "REQUIRED_DOCUMENTS",
+        "MEETING_PURPOSE",
+        "DONOR_NAME",
+        "ORGANIZATION_ROLE",
+        "PROGRAM_NAME",
+        "CALENDLY_LINK",
+        "STAFF_NAME",
+        "STAFF_TITLE",
+        "RELEVANT_DOCUMENT",
+        "PHONE_NUMBER",
+        "DURATION",
+        "DISCUSSION_TOPIC",
+        "PROMISED_RESOURCES",
+        "ACTION_ITEMS",
+        "DEADLINE"
+      ]
+    }
+  ]
+}
