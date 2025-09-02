@@ -6,24 +6,22 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { SearchBox } from "../../components/SearchBox";
 import { PromptCard } from "../../components/PromptCard";
+import { FilterSidebar } from "../../components/FilterSidebar";
+import { SearchBreadcrumb } from "../../components/Breadcrumb";
 
 export default function SearchPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <header className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              Search Results
-            </h1>
-            <a 
-              href="/"
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 
-                        text-sm font-medium"
-            >
-              ← Back to Home
-            </a>
-          </div>
+          <Suspense fallback={
+            <div className="animate-pulse">
+              <div className="h-5 bg-gray-200 dark:bg-gray-600 rounded w-32 mb-2"></div>
+              <div className="h-8 bg-gray-200 dark:bg-gray-600 rounded w-48"></div>
+            </div>
+          }>
+            <SearchHeaderContent />
+          </Suspense>
         </div>
       </header>
 
@@ -36,13 +34,27 @@ export default function SearchPage() {
   );
 }
 
+function SearchHeaderContent() {
+  const searchParams = useSearchParams();
+  const query = searchParams.get('q') || '';
+
+  return (
+    <div className="space-y-3">
+      <SearchBreadcrumb query={query} />
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        Search Results
+      </h1>
+    </div>
+  );
+}
+
 function SearchContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   const [query, setQuery] = useState(initialQuery);
   const [filters, setFilters] = useState<{
     category?: string;
-    complexity?: string;
+    tags?: string[];
   }>({});
 
   // Search prompts with current query and filters
@@ -66,93 +78,66 @@ function SearchContent() {
     window.history.replaceState({}, '', url);
   };
 
-  const handleFilterChange = (filterType: string, value: string) => {
+  const handleFilterChange = (filterType: string, value: string | string[]) => {
     setFilters(prev => ({
       ...prev,
-      [filterType]: value === '' ? undefined : value
+      [filterType]: (typeof value === 'string' && value === '') || (Array.isArray(value) && value.length === 0) 
+        ? undefined 
+        : value
     }));
   };
 
+  const handleClearFilters = () => {
+    setFilters({});
+  };
+
   return (
-    <div className="space-y-8">
-      {/* Search section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-        <SearchBox
-          initialValue={query}
-          onSearch={handleSearch}
-          placeholder="Search for nonprofit prompt templates..."
-          className="mb-4"
+    <div className="flex flex-col lg:flex-row gap-8">
+      {/* Filter Sidebar */}
+      <div className="w-full lg:w-80 flex-shrink-0">
+        <FilterSidebar
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onClearFilters={handleClearFilters}
+          categories={categories || []}
+          availableTags={[]} // TODO: Get from backend
+          className="sticky top-24"
         />
-        
-        {/* Filters */}
-        <div className="flex flex-wrap gap-4">
-          <div className="flex items-center space-x-2">
-            <label htmlFor="category-filter" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Category:
-            </label>
-            <select
-              id="category-filter"
-              value={filters.category || ''}
-              onChange={(e) => handleFilterChange('category', e.target.value)}
-              className="text-sm border border-gray-300 dark:border-gray-600 rounded px-3 py-1
-                        bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
-                        focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Categories</option>
-              {categories?.map(cat => (
-                <option key={cat.category} value={cat.category}>
-                  {cat.category} ({cat.count})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <label htmlFor="complexity-filter" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Complexity:
-            </label>
-            <select
-              id="complexity-filter"
-              value={filters.complexity || ''}
-              onChange={(e) => handleFilterChange('complexity', e.target.value)}
-              className="text-sm border border-gray-300 dark:border-gray-600 rounded px-3 py-1
-                        bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
-                        focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Levels</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-
-          {(filters.category || filters.complexity) && (
-            <button
-              onClick={() => setFilters({})}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
       </div>
 
-      {/* Results */}
-      <div>
-        {query ? (
-          <SearchResults results={searchResults} query={query} />
-        ) : (
-          <div className="text-center py-12">
-            <div className="text-gray-500 dark:text-gray-400">
-              <svg className="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <h3 className="text-lg font-medium mb-2">Enter a search query</h3>
-              <p className="text-sm">Search for nonprofit prompt templates by title, description, or keywords.</p>
+      {/* Main Content */}
+      <div className="flex-1 space-y-6">
+        {/* Search Box */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+          <SearchBox
+            initialValue={query}
+            onSearch={handleSearch}
+            placeholder="Search for nonprofit prompt templates..."
+            showLiveSearch={true}
+            debounceMs={400}
+          />
+        </div>
+
+        {/* Results */}
+        <div>
+          {query ? (
+            <SearchResults results={searchResults} query={query} />
+          ) : (
+            <div className="text-center py-16">
+              <div className="text-gray-500 dark:text-gray-400">
+                <svg className="mx-auto h-16 w-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <h3 className="text-xl font-medium mb-3">Enter a search query</h3>
+                <p className="text-sm max-w-md mx-auto">
+                  Search for nonprofit prompt templates by title, description, or keywords. 
+                  Use the filters on the left to narrow down your results.
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

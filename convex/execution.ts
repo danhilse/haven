@@ -179,7 +179,7 @@ export const executePrompt = action({
     const finalPrompt = interpolatePrompt(prompt.content, orgProfile, args.situation);
     
     // Build system prompt based on complexity and org profile
-    const systemPrompt = buildSystemPrompt(orgProfile, args.complexity || prompt.complexity);
+    const systemPrompt = buildSystemPrompt(orgProfile, args.complexity || "medium");
 
     try {
       // TODO: Replace with actual GPT API call
@@ -198,7 +198,7 @@ The actual GPT integration will be implemented with the AI SDK.
 
 ---
 
-*Generated with complexity level: ${args.complexity || prompt.complexity}*`;
+*Generated with complexity level: ${args.complexity || "medium"}*`;
 
       const duration = Date.now() - startTime;
 
@@ -212,7 +212,7 @@ The actual GPT integration will be implemented with the AI SDK.
         metadata: {
           model: "gpt-4-mock",
           tokens: 150, // Mock token count
-          complexity: args.complexity || prompt.complexity,
+          complexity: args.complexity || "medium",
           verbosity: "medium",
           reasoning_effort: "minimal",
           duration,
@@ -224,7 +224,7 @@ The actual GPT integration will be implemented with the AI SDK.
         metadata: {
           model: "gpt-4-mock",
           tokens: 150,
-          complexity: args.complexity || prompt.complexity,
+          complexity: args.complexity || "medium",
           verbosity: "medium",
           reasoning_effort: "minimal",
           duration,

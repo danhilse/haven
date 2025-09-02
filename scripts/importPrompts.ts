@@ -238,22 +238,16 @@ function mergeComplexityVariants(templates: TemplateMetadata[]): TemplateMetadat
         || variants.find(v => v.complexity === 'high') 
         || variants[0];
       
-      // Combine all complexity levels in content
-      const combinedContent = `# ${title} - Multiple Complexity Levels
-
-## Low Complexity
-${variants.find(v => v.complexity === 'low')?.content || 'Not available'}
-
-## Medium Complexity  
-${variants.find(v => v.complexity === 'medium')?.content || 'Not available'}
-
-## High Complexity
-${variants.find(v => v.complexity === 'high')?.content || 'Not available'}`;
+      // Use the medium complexity version as the primary content, 
+      // or high if medium doesn't exist
+      const primaryContent = defaultVariant.content;
       
       merged.push({
-        ...defaultVariant,
-        content: combinedContent,
-        description: `${defaultVariant.description} (Available in multiple complexity levels)`,
+        title: defaultVariant.title,
+        category: defaultVariant.category,
+        subcategory: defaultVariant.subcategory,
+        content: primaryContent,
+        description: defaultVariant.description,
         tags: [...new Set(variants.flatMap(v => v.tags))], // Combine all tags
       });
     }
@@ -282,27 +276,23 @@ export async function importPrompts() {
     
     console.log(`Processed ${templates.length} templates`);
     
-    // Merge complexity variants according to build sheet requirement
-    const mergedTemplates = mergeComplexityVariants(templates);
-    console.log(`After merging complexity variants: ${mergedTemplates.length} unique prompts`);
-    
-    // Import to Convex database
+    // Import all templates (including all complexity variants)
     let imported = 0;
-    for (const template of mergedTemplates) {
+    for (const template of templates) {
       try {
         await client.mutation(api.prompts.addPrompt, {
           title: template.title,
           content: template.content,
           category: template.category,
           subcategory: template.subcategory,
-          tags: template.tags,
           complexity: template.complexity,
+          tags: template.tags,
           description: template.description,
         });
         imported++;
         
         if (imported % 10 === 0) {
-          console.log(`Imported ${imported}/${mergedTemplates.length} prompts...`);
+          console.log(`Imported ${imported}/${templates.length} prompts...`);
         }
       } catch (error) {
         console.error(`Failed to import template "${template.title}":`, error);
@@ -312,15 +302,12 @@ export async function importPrompts() {
     console.log(`✅ Import complete! Successfully imported ${imported} prompts.`);
     
     // Print summary statistics
-    const categories = [...new Set(mergedTemplates.map(t => t.category))];
-    const complexityDistribution = mergedTemplates.reduce((acc, t) => {
-      acc[t.complexity] = (acc[t.complexity] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const categories = [...new Set(templates.map(t => t.category))];
+    const subcategories = [...new Set(templates.map(t => t.subcategory))];
     
     console.log('\n📊 Import Summary:');
     console.log(`Categories: ${categories.join(', ')}`);
-    console.log(`Complexity distribution:`, complexityDistribution);
+    console.log(`Subcategories: ${subcategories.length}`);
     console.log(`Total unique prompts: ${imported}`);
     
   } catch (error) {

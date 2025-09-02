@@ -8,8 +8,8 @@ export default defineSchema({
     content: v.string(), // The actual prompt template
     category: v.string(),
     subcategory: v.string(),
-    tags: v.array(v.string()), // audience, content type, channel
     complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    tags: v.array(v.string()), // audience, content type, channel
     description: v.string(), // Auto-generated short description
     embedding: v.optional(v.array(v.number())), // Optional vector embedding for semantic search
     createdAt: v.number(),
@@ -17,11 +17,11 @@ export default defineSchema({
   })
     .index("by_category", ["category"])
     .index("by_subcategory", ["category", "subcategory"])
-    .index("by_complexity", ["complexity"])
+    .index("by_complexity", ["title", "complexity"])
     .index("by_created", ["createdAt"])
     .searchIndex("search_prompts", {
       searchField: "title",
-      filterFields: ["category", "subcategory", "tags", "complexity"]
+      filterFields: ["category", "subcategory", "tags"]
     })
     // Vector search for semantic similarity (optional)
     .vectorIndex("by_embedding", {

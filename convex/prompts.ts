@@ -4,7 +4,7 @@ import { Doc, Id } from "./_generated/dataModel";
 import { api } from "./_generated/api";
 import { generatePromptOutput } from "../lib/openai";
 
-// Get prompts by category and optional subcategory
+// Get unique prompts by category and optional subcategory (grouped by title, showing only medium complexity)
 export const getPromptsByCategory = query({
   args: { 
     category: v.string(), 
@@ -16,7 +16,6 @@ export const getPromptsByCategory = query({
     _creationTime: v.number(),
     title: v.string(),
     description: v.string(),
-    complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
     tags: v.array(v.string()),
     category: v.string(),
     subcategory: v.string(),
@@ -34,16 +33,28 @@ export const getPromptsByCategory = query({
         );
     }
 
-    const prompts = await query
-      .order("desc")
-      .take(args.limit ?? 50);
+    const allPrompts = await query.collect();
+    
+    // Group by title and pick medium complexity variant (or first available)
+    const uniquePrompts = new Map<string, typeof allPrompts[0]>();
+    
+    allPrompts.forEach(prompt => {
+      const existing = uniquePrompts.get(prompt.title);
+      if (!existing || prompt.complexity === 'medium' || 
+          (existing.complexity !== 'medium' && prompt.complexity === 'high')) {
+        uniquePrompts.set(prompt.title, prompt);
+      }
+    });
 
-    return prompts.map(prompt => ({
+    const results = Array.from(uniquePrompts.values())
+      .sort((a, b) => b._creationTime - a._creationTime)
+      .slice(0, args.limit ?? 50);
+
+    return results.map(prompt => ({
       _id: prompt._id,
       _creationTime: prompt._creationTime,
       title: prompt.title,
       description: prompt.description,
-      complexity: prompt.complexity,
       tags: prompt.tags,
       category: prompt.category,
       subcategory: prompt.subcategory,
@@ -51,14 +62,13 @@ export const getPromptsByCategory = query({
   },
 });
 
-// Search prompts using full-text search
+// Search unique prompts using full-text search (grouped by title, showing only medium complexity)
 export const searchPrompts = query({
   args: { 
     query: v.string(), 
     filters: v.optional(v.object({
       category: v.optional(v.string()),
       subcategory: v.optional(v.string()),
-      complexity: v.optional(v.string()),
       tags: v.optional(v.array(v.string()))
     })),
     limit: v.optional(v.number())
@@ -68,7 +78,6 @@ export const searchPrompts = query({
     _creationTime: v.number(),
     title: v.string(),
     description: v.string(),
-    complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
     tags: v.array(v.string()),
     category: v.string(),
     subcategory: v.string(),
@@ -85,18 +94,28 @@ export const searchPrompts = query({
     if (args.filters?.subcategory) {
       searchQuery = searchQuery.filter((q) => q.eq(q.field("subcategory"), args.filters!.subcategory!));
     }
-    if (args.filters?.complexity) {
-      searchQuery = searchQuery.filter((q) => q.eq(q.field("complexity"), args.filters!.complexity!));
-    }
 
-    const results = await searchQuery.take(args.limit ?? 20);
+    const allResults = await searchQuery.collect();
+    
+    // Group by title and pick medium complexity variant (or first available)
+    const uniquePrompts = new Map<string, typeof allResults[0]>();
+    
+    allResults.forEach(prompt => {
+      const existing = uniquePrompts.get(prompt.title);
+      if (!existing || prompt.complexity === 'medium' || 
+          (existing.complexity !== 'medium' && prompt.complexity === 'high')) {
+        uniquePrompts.set(prompt.title, prompt);
+      }
+    });
+
+    const results = Array.from(uniquePrompts.values())
+      .slice(0, args.limit ?? 20);
 
     return results.map(prompt => ({
       _id: prompt._id,
       _creationTime: prompt._creationTime,
       title: prompt.title,
       description: prompt.description,
-      complexity: prompt.complexity,
       tags: prompt.tags,
       category: prompt.category,
       subcategory: prompt.subcategory,
@@ -110,13 +129,14 @@ export const getPromptById = query({
   returns: v.union(v.null(), v.object({
     _id: v.id("prompts"),
     _creationTime: v.number(),
+    embedding: v.optional(v.array(v.number())),
     title: v.string(),
     content: v.string(),
-    description: v.string(),
-    complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
-    tags: v.array(v.string()),
     category: v.string(),
     subcategory: v.string(),
+    complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    tags: v.array(v.string()),
+    description: v.string(),
     createdAt: v.number(),
     updatedAt: v.number(),
   })),
@@ -127,13 +147,14 @@ export const getPromptById = query({
     return {
       _id: prompt._id,
       _creationTime: prompt._creationTime,
+      embedding: prompt.embedding,
       title: prompt.title,
       content: prompt.content,
-      description: prompt.description,
-      complexity: prompt.complexity,
-      tags: prompt.tags,
       category: prompt.category,
       subcategory: prompt.subcategory,
+      complexity: prompt.complexity,
+      tags: prompt.tags,
+      description: prompt.description,
       createdAt: prompt.createdAt,
       updatedAt: prompt.updatedAt,
     };
@@ -175,8 +196,8 @@ export const addPrompt = mutation({
     content: v.string(),
     category: v.string(),
     subcategory: v.string(),
-    tags: v.array(v.string()),
     complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    tags: v.array(v.string()),
     description: v.string(),
     embedding: v.optional(v.array(v.number())),
   },
@@ -189,8 +210,8 @@ export const addPrompt = mutation({
       content: args.content,
       category: args.category,
       subcategory: args.subcategory,
-      tags: args.tags,
       complexity: args.complexity,
+      tags: args.tags,
       description: args.description,
       embedding: args.embedding,
       createdAt: now,
@@ -243,8 +264,8 @@ export const create = mutation({
     content: v.string(),
     category: v.string(),
     subcategory: v.string(),
-    tags: v.array(v.string()),
     complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    tags: v.array(v.string()),
     description: v.string(),
     embedding: v.optional(v.array(v.number())),
     createdAt: v.number(),
@@ -257,8 +278,8 @@ export const create = mutation({
       content: args.content,
       category: args.category,
       subcategory: args.subcategory,
-      tags: args.tags,
       complexity: args.complexity,
+      tags: args.tags,
       description: args.description,
       embedding: args.embedding,
       createdAt: args.createdAt,
@@ -267,13 +288,62 @@ export const create = mutation({
   },
 });
 
+// Get prompt by title and complexity
+export const getPromptByTitleAndComplexity = query({
+  args: { 
+    title: v.string(),
+    complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high"))
+  },
+  returns: v.union(v.null(), v.object({
+    _id: v.id("prompts"),
+    _creationTime: v.number(),
+    title: v.string(),
+    content: v.string(),
+    description: v.string(),
+    tags: v.array(v.string()),
+    category: v.string(),
+    subcategory: v.string(),
+    complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })),
+  handler: async (ctx, args) => {
+    const prompt = await ctx.db
+      .query("prompts")
+      .withIndex("by_complexity", (q) => q.eq("title", args.title).eq("complexity", args.complexity))
+      .first();
+
+    if (!prompt) return null;
+
+    return {
+      _id: prompt._id,
+      _creationTime: prompt._creationTime,
+      title: prompt.title,
+      content: prompt.content,
+      description: prompt.description,
+      tags: prompt.tags,
+      category: prompt.category,
+      subcategory: prompt.subcategory,
+      complexity: prompt.complexity,
+      createdAt: prompt.createdAt,
+      updatedAt: prompt.updatedAt,
+    };
+  },
+});
+
 // Execute a prompt with organization context and situation using GPT-5
 export const executePrompt = action({
   args: {
     promptId: v.id("prompts"),
-    orgProfileId: v.id("orgProfiles"),
     situation: v.string(),
-    complexity: v.optional(v.union(v.literal("low"), v.literal("medium"), v.literal("high")))
+    complexity: v.optional(v.union(v.literal("low"), v.literal("medium"), v.literal("high"))),
+    orgProfile: v.object({
+      name: v.string(),
+      mission: v.string(),
+      tone: v.string(),
+      region: v.string(),
+      customFields: v.optional(v.record(v.string(), v.any())),
+    })
   },
   returns: v.object({
     output: v.string(),
@@ -286,44 +356,37 @@ export const executePrompt = action({
     })
   }),
   handler: async (ctx, args) => {
-    // 1. Fetch prompt and org profile
-    const prompt = await ctx.runQuery(api.prompts.getPromptById, { promptId: args.promptId });
-    if (!prompt) {
+    // 1. Fetch base prompt to get title
+    const basePrompt = await ctx.runQuery(api.prompts.getPromptById, { promptId: args.promptId });
+    if (!basePrompt) {
       throw new Error("Prompt not found");
     }
 
-    const orgProfile = await ctx.runQuery(api.orgProfiles.getById, { id: args.orgProfileId });
-    if (!orgProfile) {
-      throw new Error("Organization profile not found");
+    // 2. Use the provided complexity or default to medium
+    const complexity = args.complexity || "medium";
+
+    // 3. Fetch the specific complexity variant
+    const complexityPrompt = await ctx.runQuery(api.prompts.getPromptByTitleAndComplexity, { 
+      title: basePrompt.title, 
+      complexity 
+    });
+    
+    if (!complexityPrompt) {
+      throw new Error(`Prompt with ${complexity} complexity not found`);
     }
 
-    // 2. Use the prompt's complexity or the provided override
-    const complexity = args.complexity || prompt.complexity;
-
-    // 3. Call GPT-5 via our integration
+    // 4. Call GPT-5 via our integration
     const result = await generatePromptOutput({
-      prompt: prompt.content,
-      orgProfile: {
-        name: orgProfile.name,
-        mission: orgProfile.mission,
-        tone: orgProfile.tone,
-        region: orgProfile.region,
-      },
+      prompt: complexityPrompt.content,
+      orgProfile: args.orgProfile,
       situation: args.situation,
       complexity,
     });
 
-    // 4. Store run record
-    await ctx.runMutation(api.runs.create, {
-      promptId: args.promptId,
-      orgProfileId: args.orgProfileId,
-      userInput: args.situation,
-      output: result.output,
-      outputFormat: "markdown",
-      metadata: result.metadata,
-    });
+    // 5. Store run record (simplified without org profile storage)
+    // TODO: Implement run history if needed
 
-    // 5. Return generated content
+    // 6. Return generated content
     return result;
   },
 });

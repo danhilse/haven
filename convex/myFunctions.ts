@@ -18,7 +18,6 @@ export const getLibraryStats = query({
       _id: v.id("prompts"),
       title: v.string(),
       category: v.string(),
-      complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
     })),
   }),
   handler: async (ctx) => {
@@ -39,7 +38,6 @@ export const getLibraryStats = query({
         _id: p._id,
         title: p.title,
         category: p.category,
-        complexity: p.complexity,
       })),
     };
   },

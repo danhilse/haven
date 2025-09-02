@@ -1,31 +1,33 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, use } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { PromptCard } from "../../../components/PromptCard";
 import { SearchBox } from "../../../components/SearchBox";
+import { CategoryBreadcrumb } from "../../../components/Breadcrumb";
 
 interface CategoryPageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export default function CategoryPage({ params }: CategoryPageProps) {
+  const resolvedParams = use(params);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Convert slug back to category name (reverse of the slug creation logic)
   const categoryName = useMemo(() => {
-    return params.slug
+    return resolvedParams.slug
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
-  }, [params.slug]);
+  }, [resolvedParams.slug]);
 
   // Get all categories to find the correct category and its subcategories
   const categories = useQuery(api.prompts.getCategories);
   const currentCategory = categories?.find(cat => 
-    cat.category.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') === params.slug
+    cat.category.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') === resolvedParams.slug
   );
 
   // Get prompts for this category
@@ -76,16 +78,11 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between mb-4">
-            <nav className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-              <a href="/" className="hover:text-gray-700 dark:hover:text-gray-200">
-                Home
-              </a>
-              <span>→</span>
-              <span className="text-gray-900 dark:text-gray-100 font-medium">
-                {currentCategory.category}
-              </span>
-            </nav>
+          <div className="flex items-center justify-between mb-6">
+            <CategoryBreadcrumb 
+              categoryName={currentCategory.category}
+              categorySlug={resolvedParams.slug}
+            />
           </div>
           
           <div className="flex flex-col md:flex-row md:items-center justify-between">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 interface SearchBoxProps {
@@ -8,25 +8,55 @@ interface SearchBoxProps {
   initialValue?: string;
   className?: string;
   onSearch?: (query: string) => void;
+  debounceMs?: number;
+  showLiveSearch?: boolean;
 }
 
 export function SearchBox({ 
   placeholder = "Search prompts...", 
   initialValue = "",
   className = "",
-  onSearch
+  onSearch,
+  debounceMs = 300,
+  showLiveSearch = true
 }: SearchBoxProps) {
   const [query, setQuery] = useState(initialValue);
+  const [isSearching, setIsSearching] = useState(false);
   const router = useRouter();
 
-  const handleSearch = (searchQuery: string) => {
+  const handleSearch = useCallback((searchQuery: string) => {
+    setIsSearching(false);
     if (onSearch) {
       onSearch(searchQuery);
     } else {
       // Navigate to search page with query parameter
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
-  };
+  }, [onSearch, router]);
+
+  // Debounced search effect for live search
+  useEffect(() => {
+    if (!showLiveSearch || !onSearch) return;
+    
+    if (query.trim().length === 0) {
+      handleSearch('');
+      return;
+    }
+
+    if (query.trim().length < 2) {
+      return; // Don't search for very short queries
+    }
+
+    setIsSearching(true);
+    const timeoutId = setTimeout(() => {
+      handleSearch(query.trim());
+    }, debounceMs);
+
+    return () => {
+      clearTimeout(timeoutId);
+      setIsSearching(false);
+    };
+  }, [query, debounceMs, handleSearch, showLiveSearch, onSearch]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,10 +92,16 @@ export function SearchBox({
                      p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200
                      disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          {isSearching && showLiveSearch ? (
+            <div className="w-5 h-5">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-500 dark:border-gray-400"></div>
+            </div>
+          ) : (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          )}
         </button>
       </div>
       

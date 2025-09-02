@@ -8,25 +8,12 @@ interface PromptCardProps {
     _id: Id<"prompts">;
     title: string;
     description: string;
-    complexity: "low" | "medium" | "high";
     tags: string[];
     category: string;
     subcategory: string;
   };
   className?: string;
 }
-
-const complexityColors = {
-  low: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  medium: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  high: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-};
-
-const complexityLabels = {
-  low: "Low",
-  medium: "Medium", 
-  high: "High"
-};
 
 export function PromptCard({ prompt, className = "" }: PromptCardProps) {
   return (
@@ -38,18 +25,13 @@ export function PromptCard({ prompt, className = "" }: PromptCardProps) {
                      rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200
                      group-hover:border-blue-300 dark:group-hover:border-blue-600">
         
-        {/* Header with complexity badge */}
-        <div className="flex justify-between items-start mb-3">
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 
-                          group-hover:text-blue-600 dark:group-hover:text-blue-400 
-                          transition-colors duration-200 line-clamp-2">
-              {prompt.title}
-            </h3>
-          </div>
-          <span className={`ml-3 px-2 py-1 text-xs font-medium rounded-full ${complexityColors[prompt.complexity]}`}>
-            {complexityLabels[prompt.complexity]}
-          </span>
+        {/* Header */}
+        <div className="mb-3">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 
+                        group-hover:text-blue-600 dark:group-hover:text-blue-400 
+                        transition-colors duration-200 line-clamp-2">
+            {prompt.title}
+          </h3>
         </div>
 
         {/* Description */}
