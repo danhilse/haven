@@ -75,7 +75,7 @@ export function CategoryGrid({ className = "" }: CategoryGridProps) {
                   d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
           <h3 className="text-lg font-medium mb-2">No categories found</h3>
-          <p className="text-sm">Prompt templates will appear here when available.</p>
+          <p className="text-sm">Ready-made guidance will appear here when available.</p>
         </div>
       </div>
     );
@@ -143,7 +143,7 @@ function SubcategoriesGridStep({ subcategories, onSelectSubcategory }: Subcatego
           What do you need help with?
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
-          Choose from our specialized template areas. Each color represents a different category.
+          Choose from our ready-to-use guidance. Each color represents a different area of support.
         </p>
       </div>
       
@@ -232,10 +232,10 @@ function TemplatesStep({ category, subcategory }: TemplatesStepProps) {
     <div>
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-          {subcategory || category} Templates
+          {subcategory || category} Guidance
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
-          Found {prompts.length} template{prompts.length !== 1 ? 's' : ''}
+          Found {prompts.length} conversation{prompts.length !== 1 ? 's' : ''} ready to help
         </p>
       </div>
       
@@ -265,7 +265,7 @@ function TemplatesStep({ category, subcategory }: TemplatesStepProps) {
               )}
             </div>
             <button className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline">
-              Use this template →
+              Start this conversation →
             </button>
           </div>
         ))}

@@ -339,8 +339,9 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'text-embedding-3-small', // 384 dimensions to match schema
+        model: 'text-embedding-3-small',
         input: text,
+        dimensions: 384, // Specify 384 dimensions to match schema
         encoding_format: 'float'
       })
     });

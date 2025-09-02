@@ -10,7 +10,7 @@ export default function Home() {
       <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Nonprofit Prompt Library
+            Haven
           </h1>
         </div>
       </header>
@@ -20,17 +20,16 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-              AI-Powered Prompts for Nonprofits
+              Your quiet strategist
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
-              Access hundreds of curated prompt templates designed specifically for nonprofit organizations. 
-              Describe your communication needs in natural language to find the perfect templates.
+              Start stronger on every task—from donor letters to grant drafts—so you can focus on the mission, not the busywork.
             </p>
             
             {/* Main Semantic Search */}
             <div className="mb-8">
               <SemanticSearchBox
-                placeholder="Describe what you need help with..."
+                placeholder="What do you need help with today?"
                 className="max-w-2xl mx-auto"
               />
             </div>
@@ -47,7 +46,7 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
                         d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-                Smart Search
+                Find your next answer
               </a>
               <a
                 href="#categories"
@@ -60,7 +59,7 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
                         d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                Quick Find
+                Explore the library
               </a>
             </div>
           </div>
@@ -72,11 +71,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-              Find Templates in 2 Steps
+              Clarity on demand
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Browse our colorful collection of specialized template areas. 
-              Pick what you need help with, then find the perfect templates.
+              Your board has questions, donors need updates, a report is due. We give you the words, tuned to your mission, ready in moments.
             </p>
           </div>
           <CategoryGrid />
@@ -87,7 +85,7 @@ export default function Home() {
       <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-500 dark:text-gray-400">
-            <p>Nonprofit Prompt Library - Empowering organizations with AI-powered templates</p>
+            <p>Haven - The work is hard enough. Let us give you a head start.</p>
           </div>
         </div>
       </footer>

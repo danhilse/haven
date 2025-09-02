@@ -74,3 +74,6 @@ Templates are stored in the `context/pages_nonprofit_ai_templates` directory as 
 
 ## Design
 Use shadcn. Keep in mind that the package is not shadcn/ui, it's just shadcn now.
+
+## Copywriting
+Use the copy style guide in `context/COPY_STYLE_GUIDE.md` for all copywriting.

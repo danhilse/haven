@@ -408,35 +408,9 @@ export const checkRateLimit = mutation({
 - Touch-friendly interface elements
 - Optimized loading states and error handling
 
-## Phase 6: Technical Implementation Priorities
+## Phase 6: Deployment & Infrastructure
 
-### Sprint 1 (Foundation)
-1. ✅ Set up Convex schema and basic queries
-2. ✅ Create prompt import pipeline
-3. ✅ Build landing page and basic navigation
-4. ✅ Implement organization profile setup
-
-### Sprint 2 (Search & Browse)
-1. ✅ Full-text search implementation
-2. ✅ Category browsing with filtering
-3. ✅ Prompt card components and layouts
-4. ✅ Basic responsive design
-
-### Sprint 3 (Execution Engine)
-1. ✅ GPT-5 integration with direct OpenAI API calls (with GPT-4 fallback)
-2. ✅ Prompt template interpolation system
-3. ✅ Output rendering and display  
-4. ✅ Rate limiting implementation
-
-### Sprint 4 (Polish & Optimization)
-1. ✅ Enhanced search with embeddings (if needed)
-2. ✅ Performance optimization and caching
-3. ✅ Error handling and edge cases
-4. ✅ Security hardening and IP filtering
-
-## Phase 7: Deployment & Infrastructure
-
-### 7.1 Environment Setup
+### 6.1 Environment Setup
 
 ```bash
 # Environment variables
@@ -446,7 +420,7 @@ CONVEX_DEPLOYMENT=your-deployment
 RATE_LIMIT_REDIS_URL=redis://... (if using Redis for rate limiting)
 ```
 
-### 7.2 Security Considerations
+### 6.2 Security Considerations
 
 - IP-based access control (private link + allowlist)
 - Rate limiting per IP address
@@ -454,7 +428,7 @@ RATE_LIMIT_REDIS_URL=redis://... (if using Redis for rate limiting)
 - Prompt injection protection
 - API key security and rotation
 
-### 7.3 Monitoring & Analytics
+### 6.3 Monitoring & Analytics
 
 - Convex built-in metrics for database performance
 - Custom analytics for prompt usage patterns
