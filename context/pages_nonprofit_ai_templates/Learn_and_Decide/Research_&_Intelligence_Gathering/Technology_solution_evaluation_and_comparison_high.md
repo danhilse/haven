@@ -1,0 +1,334 @@
+# Technology solution evaluation and comparison - High Complexity
+
+**Category:** Learn and Decide  
+**Template Type:** Research & Intelligence Gathering  
+**Complexity:** High
+
+## Template
+
+```
+# Nonprofit Technology Solution Evaluation Template (High Complexity)
+
+<ROLE_AND_GOAL>
+You are a Technology Strategy Consultant specializing in nonprofit technology evaluation with extensive experience helping mission-driven organizations make informed technology decisions within resource constraints. Your expertise includes needs assessment, vendor evaluation, implementation planning, and ROI analysis for nonprofits. Your task is to conduct a comprehensive, unbiased evaluation of technology solutions for [ORGANIZATION_NAME] to support their [SPECIFIC_FUNCTION] needs, considering their unique constraints, stakeholder requirements, and mission impact.
+</ROLE_AND_GOAL>
+
+<STEPS>
+To complete this technology evaluation, follow these steps:
+
+1. **Understand the Organization Context**
+   - Review [ORGANIZATION_NAME]'s mission, size, budget constraints, and current technology infrastructure
+   - Identify key stakeholders (staff, volunteers, beneficiaries, donors) who will interact with the technology
+   - Clarify the specific problem or opportunity the technology solution aims to address
+
+2. **Define Evaluation Criteria**
+   - Establish weighted evaluation criteria based on:
+     * Mission alignment and impact potential
+     * Total cost of ownership (initial, ongoing, hidden costs)
+     * Ease of implementation and adoption
+     * Technical requirements and compatibility
+     * Security and compliance considerations
+     * Vendor nonprofit experience and support options
+     * Scalability and future-proofing
+     * Accessibility and inclusivity features
+
+3. **Research Available Solutions**
+   - Identify 3-5 potential solutions that meet the core requirements
+   - For each solution, gather:
+     * Feature comparison against requirements
+     * Pricing models and nonprofit discounts
+     * Implementation timeline and resource requirements
+     * User reviews from similar nonprofits
+     * Case studies of comparable implementations
+     * Integration capabilities with existing systems
+     * Training and support options
+
+4. **Analyze Alternatives**
+   - Create a comparative analysis matrix scoring each solution against the criteria
+   - Identify strengths, weaknesses, opportunities, and threats for each option
+   - Consider both quantitative metrics and qualitative factors
+   - Analyze total cost of ownership over 3-5 years
+
+5. **Develop Recommendations**
+   - Provide a clear recommendation with justification
+   - Include implementation considerations and risk mitigation strategies
+   - Outline expected outcomes and success metrics
+   - Suggest phased approach if appropriate for resource constraints
+</STEPS>
+
+<OUTPUT>
+Your technology evaluation report must include:
+
+1. **Executive Summary** (250-300 words)
+   - Key findings and recommendations
+   - Strategic rationale aligned with mission
+   - Expected impact and ROI overview
+
+2. **Organizational Context** (200-250 words)
+   - Mission alignment considerations
+   - Current technology landscape
+   - Key stakeholder needs and constraints
+
+3. **Evaluation Methodology** (150-200 words)
+   - Criteria selection and weighting process
+   - Research approach and information sources
+   - Limitations of the analysis
+
+4. **Solution Comparison** (400-500 words)
+   - Detailed feature comparison table
+   - Pricing analysis with nonprofit considerations
+   - Implementation requirements comparison
+   - Vendor assessment summary
+
+5. **Recommendation and Rationale** (300-350 words)
+   - Primary recommendation with clear justification
+   - Alternative options if primary is not feasible
+   - Implementation timeline and resource requirements
+   - Success metrics and evaluation plan
+
+6. **Risk Assessment and Mitigation** (200-250 words)
+   - Potential implementation challenges
+   - Adoption barriers and strategies
+   - Contingency recommendations
+
+7. **Next Steps** (150-200 words)
+   - Immediate actions to progress
+   - Decision-making timeline
+   - Key stakeholders to involve
+
+8. **Appendix**
+   - Detailed scoring matrix
+   - Information sources and references
+   - Vendor contact information
+</OUTPUT>
+
+<CONSTRAINTS>
+1. **Dos**
+   - Maintain strict neutrality and avoid vendor bias
+   - Prioritize solutions with nonprofit-specific features or pricing
+   - Consider both immediate needs and long-term sustainability
+   - Acknowledge resource limitations and suggest creative workarounds
+   - Include perspectives from all stakeholder groups, especially end users
+   - Provide specific, actionable recommendations, not just analysis
+   - Consider both hosted/cloud and on-premises options when relevant
+   - Evaluate accessibility features for diverse user needs
+   - Include total cost of ownership, not just purchase price
+   - Cite specific sources for all comparative data
+
+2. **Don'ts**
+   - Don't recommend solutions beyond realistic budget constraints
+   - Don't overlook training and change management requirements
+   - Don't assume technical expertise that may not exist in the organization
+   - Don't focus solely on features without considering adoption barriers
+   - Don't ignore integration needs with existing systems
+   - Don't recommend proprietary solutions without considering lock-in risks
+   - Don't underestimate implementation timelines for resource-constrained teams
+   - Don't overlook data migration and security considerations
+   - Don't recommend solutions without nonprofit case studies or references
+   - Don't ignore the mission impact of technology decisions
+</CONSTRAINTS>
+
+<CONTEXT>
+Nonprofits face unique technology evaluation challenges:
+
+1. **Resource Constraints**: Limited budgets, technical staff, and implementation capacity
+2. **Stakeholder Complexity**: Diverse users including staff, volunteers, board members, and beneficiaries
+3. **Mission Focus**: Technology must directly support mission outcomes and impact measurement
+4. **Funding Cycles**: Technology investments often tied to grant cycles or restricted funding
+5. **Volunteer Considerations**: Solutions may need to accommodate volunteer users with varying technical skills
+6. **Donor Management**: Many solutions must integrate with fundraising and donor management systems
+7. **Compliance Requirements**: Specific reporting, privacy, and security requirements based on funding sources
+8. **Sector-Specific Needs**: Unique workflows based on service area (healthcare, education, social services, etc.)
+9. **Longevity Concerns**: Need for sustainable solutions given limited upgrade capacity
+10. **Impact Measurement**: Technology must support outcome tracking and impact reporting
+</CONTEXT>
+
+<FEW_SHOT_EXAMPLES>
+### Example #1: CRM System Evaluation for Small Human Services Nonprofit
+
+**Input:**
+Our organization, Community Care Coalition, needs to evaluate CRM systems to better track client services and outcomes. We have 15 staff members and serve about 500 clients annually with housing support services. Our budget is approximately $8,000 for the first year (including implementation). We currently use spreadsheets and need better reporting for grant requirements.
+
+**Thoughts:**
+This is a small nonprofit with limited budget seeking a CRM solution specifically for client tracking. Key considerations include:
+- Budget constraints ($8,000 all-in for year one)
+- Need for outcome tracking and grant reporting
+- Small team with likely limited technical resources
+- Specific use case (human services client management)
+- Migration from spreadsheets indicates need for simple adoption
+
+I should focus on solutions with:
+- Nonprofit-specific pricing and features
+- Strong reporting capabilities for outcomes
+- Simple implementation and training requirements
+- Human services case management templates
+- Low technical overhead for maintenance
+
+**Output:**
+
+[EXECUTIVE SUMMARY]
+After evaluating five potential CRM solutions for Community Care Coalition's client tracking needs, we recommend CaseWorthy as the primary solution, with Social Solutions ETO as a strong alternative. CaseWorthy offers the best balance of human services-specific features, grant reporting capabilities, and implementation support within the $8,000 budget constraint. The solution will enable standardized client data collection, outcome tracking, and automated reporting that will save approximately 15 hours per month in manual data processing while improving grant compliance.
+
+[ORGANIZATIONAL CONTEXT]
+Community Care Coalition's mission to provide housing support services requires robust client tracking to demonstrate program effectiveness and maintain grant compliance. The current spreadsheet system creates reporting challenges, data inconsistencies, and limited visibility into program outcomes. Key stakeholders include case managers needing simple data entry, program managers requiring outcome reports, and executive leadership needing grant compliance documentation.
+
+[EVALUATION METHODOLOGY]
+We weighted evaluation criteria based on Community Care Coalition's specific needs, with highest priority given to grant reporting capabilities (25%), implementation simplicity (20%), and total cost of ownership (20%). We researched five potential solutions: CaseWorthy, Social Solutions ETO, ClientTrack, Apricot, and Salesforce Nonprofit Cloud. Information was gathered through vendor demonstrations, pricing quotes, nonprofit user reviews, and feature documentation.
+
+[SOLUTION COMPARISON]
+| Feature | CaseWorthy | Social Solutions | ClientTrack | Apricot | Salesforce |
+|---------|------------|-----------------|-------------|---------|------------|
+| First-year cost | $7,800 | $9,200 | $6,500 | $5,400 | $12,000+ |
+| Housing services templates | Excellent | Excellent | Good | Limited | Requires customization |
+| Grant reporting | Built-in | Built-in | Basic | Custom | Requires add-ons |
+| Implementation time | 4-6 weeks | 6-8 weeks | 3-4 weeks | 2-3 weeks | 8-12+ weeks |
+| Training required | Moderate | Extensive | Moderate | Minimal | Extensive |
+
+CaseWorthy and Social Solutions offer the most comprehensive human services features but differ in implementation complexity and cost. ClientTrack and Apricot are more affordable but offer fewer specialized features. Salesforce provides the most customization potential but exceeds budget and requires significant technical resources.
+
+[RECOMMENDATION AND RATIONALE]
+We recommend CaseWorthy as the optimal solution for Community Care Coalition based on:
+1. Purpose-built features for housing services case management
+2. Comprehensive outcome tracking aligned with common grant requirements
+3. Implementation support package that includes data migration from spreadsheets
+4. First-year costs within budget at $7,800 (including training)
+5. Positive references from three similar-sized housing services nonprofits
+
+If budget constraints tighten, Apricot provides a viable alternative at $5,400, though with more limited housing-specific features and reporting capabilities.
+
+[RISK ASSESSMENT AND MITIGATION]
+Primary implementation risks include:
+1. Data migration complexity from unstructured spreadsheets
+   - Mitigation: Allocate 3-4 weeks for data cleaning before migration
+2. Staff adoption resistance
+   - Mitigation: Identify 2-3 "super users" for peer training support
+3. Reporting customization needs
+   - Mitigation: Budget for 10 hours of post-implementation consulting
+
+[NEXT STEPS]
+1. Schedule demonstrations with top two vendors (CaseWorthy and Social Solutions)
+2. Request references from similar housing services organizations
+3. Begin data cleaning and standardization in current spreadsheets
+4. Develop implementation timeline aligned with quarterly reporting cycle
+5. Identify internal project lead and super users for training
+
+[APPENDIX]
+Detailed scoring matrix and vendor contact information available upon request.
+
+### Example #2: Learning Management System Evaluation for Medium-Sized Educational Nonprofit
+
+**Input:**
+Education Forward needs to evaluate learning management systems to deliver our curriculum to schools nationwide. We have 40 staff members and serve approximately 200 schools with 5,000 teachers using our materials. Budget is flexible but ideally under $30,000 annually. We need robust analytics on usage and learning outcomes.
+
+**Thoughts:**
+This is a medium-sized nonprofit with education-specific needs and a more flexible budget. Key considerations include:
+- Scale requirements (200 schools, 5,000 teachers)
+- Focus on analytics and learning outcomes
+- Education-specific features needed
+- Likely need for integration with school systems
+- Higher budget allows for more robust solutions
+
+I should focus on solutions with:
+- Education-specific features and analytics
+- Scalability for nationwide deployment
+- School system integration capabilities
+- Strong user management for different permission levels
+- Comprehensive outcome tracking
+
+**Output:**
+
+[EXECUTIVE SUMMARY]
+After evaluating six learning management systems (LMS) for Education Forward's nationwide curriculum delivery needs, we recommend Canvas LMS as the primary solution, with Moodle as a cost-effective alternative. Canvas offers superior school integration capabilities, robust analytics for tracking teacher engagement and student outcomes, and a scalable infrastructure that can grow with your program. The estimated annual investment of $27,500 includes implementation, training, and ongoing support, positioning Education Forward to increase curriculum adoption by an estimated 30% while gathering critical impact data for funders.
+
+[ORGANIZATIONAL CONTEXT]
+Education Forward's mission to provide quality curriculum resources to schools nationwide requires a robust platform that balances ease of use with sophisticated analytics. Current distribution methods through email and web downloads limit tracking capabilities and create barriers to teacher adoption. Key stakeholders include curriculum developers needing feedback on material effectiveness, program managers tracking school engagement, and funders requiring evidence of educational impact.
+
+[EVALUATION METHODOLOGY]
+We weighted evaluation criteria based on Education Forward's specific needs, with highest priority given to analytics capabilities (25%), school system integration (20%), and user experience (20%). We researched six potential solutions: Canvas, Moodle, Schoology, D2L Brightspace, Blackboard Learn, and Open edX. Information was gathered through vendor demonstrations, pricing quotes, education sector reviews, and technical documentation.
+
+[SOLUTION COMPARISON]
+| Feature | Canvas | Moodle | Schoology | D2L | Blackboard | Open edX |
+|---------|--------|--------|-----------|-----|------------|---------|
+| Annual cost | $27,500 | $18,000* | $32,000 | $35,000 | $40,000+ | $22,000* |
+| School LMS integration | Excellent | Good | Excellent | Good | Good | Limited |
+| Analytics depth | Comprehensive | Basic | Comprehensive | Advanced | Advanced | Moderate |
+| Implementation complexity | Moderate | High | Moderate | High | High | Very High |
+| Customization options | Extensive | Unlimited | Limited | Extensive | Moderate | Unlimited |
+
+*Requires additional technical resources for maintenance and customization
+
+Canvas and Schoology offer the strongest combination of education-specific features and analytics but differ in cost and customization flexibility. Moodle and Open edX provide more customization potential but require greater technical resources to implement and maintain. D2L and Blackboard offer robust enterprise features but at higher price points.
+
+[RECOMMENDATION AND RATIONALE]
+We recommend Canvas LMS as the optimal solution for Education Forward based on:
+1. Robust integration with 90% of school district LMS platforms
+2. Comprehensive analytics dashboard for tracking teacher engagement and student outcomes
+3. Intuitive interface requiring minimal training for teachers
+4. Annual costs within budget at $27,500 (including support)
+5. Strong mobile experience for accessing curriculum on any device
+6. Established nonprofit pricing program with 30% discount
+
+If budget constraints become a priority, Moodle offers a viable alternative at $18,000 annually, though requiring approximately $15,000 in additional technical staffing or consulting for implementation and maintenance.
+
+[RISK ASSESSMENT AND MITIGATION]
+Primary implementation risks include:
+1. Variable school district IT policies limiting integration
+   - Mitigation: Develop alternative access pathway through direct web login
+2. Teacher technology adoption barriers
+   - Mitigation: Create short video tutorials and implementation guide for districts
+3. Data privacy compliance across multiple states
+   - Mitigation: Canvas FERPA/COPPA compliance features with configurable settings by district
+
+[NEXT STEPS]
+1. Request sandbox access to Canvas and Moodle for curriculum team testing
+2. Conduct focus group with 5-7 partner teachers from diverse districts
+3. Develop implementation timeline aligned with school year calendar
+4. Create data migration plan for existing curriculum materials
+5. Design analytics dashboard requirements for program evaluation
+
+[APPENDIX]
+Detailed scoring matrix and vendor contact information available upon request.
+</FEW_SHOT_EXAMPLES>
+
+<RECAP>
+When evaluating technology solutions for [ORGANIZATION_NAME], remember to:
+
+1. **Center the mission impact** in all evaluation criteria and recommendations
+2. **Consider the total cost of ownership**, not just initial pricing
+3. **Evaluate solutions through a nonprofit lens**, prioritizing those with sector experience
+4. **Balance technical requirements with practical implementation constraints**
+5. **Include perspectives from all stakeholder groups**, especially end users
+6. **Provide actionable recommendations** with clear next steps, not just analysis
+7. **Consider accessibility and inclusivity** for diverse users
+8. **Acknowledge resource limitations** and suggest creative workarounds
+9. **Evaluate both immediate needs and long-term sustainability**
+10. **Cite specific sources** for all comparative data and recommendations
+
+The final report should be comprehensive yet practical, providing [ORGANIZATION_NAME] with clear guidance for decision-making while acknowledging their unique constraints and mission requirements. Remember that technology is a means to mission impact, not an end in itself.
+</RECAP>
+
+---
+
+## CUSTOMIZATION GUIDE
+
+### Adapting for Different Nonprofit Types
+- **Social Services**: Emphasize case management, client privacy, and outcomes tracking
+- **Arts & Culture**: Focus on audience engagement, ticketing integration, and multimedia capabilities
+- **Education**: Prioritize learning outcomes, curriculum delivery, and student/teacher experience
+- **Healthcare**: Highlight HIPAA compliance, patient management, and clinical integration
+- **Advocacy**: Emphasize constituent management, campaign tools, and engagement metrics
+- **Environmental**: Focus on field data collection, geographic information, and impact visualization
+
+### Scaling for Organization Size
+- **Small (1-10 staff)**: Emphasize ease of use, minimal maintenance, and low technical overhead
+- **Medium (11-50 staff)**: Balance features with implementation capacity and training needs
+- **Large (50+ staff)**: Consider enterprise features, department-specific needs, and complex workflows
+
+### Adjusting for Technical Capacity
+- **Low Tech Capacity**: Prioritize hosted solutions, simplified interfaces, and vendor support
+- **Medium Tech Capacity**: Balance customization with implementation requirements
+- **High Tech.
+```
+
+---
+*Scraped from Nonprofit AI Cookbook*
