@@ -77,8 +77,43 @@ export const batchCreateVariables = mutation({
     const results = [];
 
     for (const variable of args.variables) {
-      const variableId = await createOrUpdateVariable(ctx, variable);
-      results.push(variableId);
+      // Check if variable already exists
+      const existing = await ctx.db
+        .query("variables")
+        .withIndex("by_name", (q) => q.eq("name", variable.name))
+        .first();
+
+      const now = Date.now();
+
+      if (existing) {
+        // Update existing variable
+        await ctx.db.patch(existing._id, {
+          basePattern: variable.basePattern,
+          isNumbered: variable.isNumbered,
+          maxNumber: variable.maxNumber,
+          description: variable.description,
+          examples: variable.examples,
+          category: variable.category,
+          promptIds: variable.promptIds,
+          updatedAt: now,
+        });
+        results.push(existing._id);
+      } else {
+        // Create new variable
+        const variableId = await ctx.db.insert("variables", {
+          name: variable.name,
+          basePattern: variable.basePattern,
+          isNumbered: variable.isNumbered,
+          maxNumber: variable.maxNumber,
+          description: variable.description,
+          examples: variable.examples,
+          category: variable.category,
+          promptIds: variable.promptIds,
+          createdAt: now,
+          updatedAt: now,
+        });
+        results.push(variableId);
+      }
     }
 
     return results;
@@ -89,43 +124,43 @@ export const batchCreateVariables = mutation({
 export const getVariables = query({
   args: {
     limit: v.optional(v.number()),
-    cursor: v.optional(v.string()),
   },
-  returns: v.object({
-    variables: v.array(v.object({
-      _id: v.id("variables"),
-      name: v.string(),
-      basePattern: v.string(),
-      isNumbered: v.boolean(),
-      maxNumber: v.optional(v.number()),
-      description: v.string(),
-      examples: v.array(v.string()),
-      category: v.string(),
-      promptIds: v.array(v.id("prompts")),
-      createdAt: v.number(),
-      updatedAt: v.number(),
-    })),
-    nextCursor: v.optional(v.string()),
-    isDone: v.boolean(),
-  }),
+  returns: v.array(v.object({
+    _id: v.id("variables"),
+    _creationTime: v.number(),
+    name: v.string(),
+    basePattern: v.string(),
+    isNumbered: v.boolean(),
+    maxNumber: v.optional(v.number()),
+    description: v.string(),
+    examples: v.array(v.string()),
+    category: v.string(),
+    promptIds: v.array(v.id("prompts")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })),
   handler: async (ctx, args) => {
     const limit = args.limit ?? 50;
     
-    let query = ctx.db.query("variables").order("desc");
+    const variables = await ctx.db
+      .query("variables")
+      .order("desc")
+      .take(limit);
     
-    if (args.cursor) {
-      query = query.startAfter(args.cursor);
-    }
-    
-    const variables = await query.take(limit + 1);
-    const hasMore = variables.length > limit;
-    const results = hasMore ? variables.slice(0, -1) : variables;
-    
-    return {
-      variables: results,
-      nextCursor: hasMore ? results[results.length - 1]._id : undefined,
-      isDone: !hasMore,
-    };
+    return variables.map(variable => ({
+      _id: variable._id,
+      _creationTime: variable._creationTime,
+      name: variable.name,
+      basePattern: variable.basePattern,
+      isNumbered: variable.isNumbered,
+      maxNumber: variable.maxNumber,
+      description: variable.description,
+      examples: variable.examples,
+      category: variable.category,
+      promptIds: variable.promptIds,
+      createdAt: variable.createdAt,
+      updatedAt: variable.updatedAt,
+    }));
   },
 });
 
@@ -136,6 +171,7 @@ export const getVariablesByCategory = query({
   },
   returns: v.array(v.object({
     _id: v.id("variables"),
+    _creationTime: v.number(),
     name: v.string(),
     basePattern: v.string(),
     isNumbered: v.boolean(),
@@ -164,6 +200,7 @@ export const getVariableByName = query({
     v.null(),
     v.object({
       _id: v.id("variables"),
+      _creationTime: v.number(),
       name: v.string(),
       basePattern: v.string(),
       isNumbered: v.boolean(),
@@ -177,10 +214,27 @@ export const getVariableByName = query({
     })
   ),
   handler: async (ctx, args) => {
-    return await ctx.db
+    const variable = await ctx.db
       .query("variables")
       .withIndex("by_name", (q) => q.eq("name", args.name))
       .first();
+    
+    if (!variable) return null;
+    
+    return {
+      _id: variable._id,
+      _creationTime: variable._creationTime,
+      name: variable.name,
+      basePattern: variable.basePattern,
+      isNumbered: variable.isNumbered,
+      maxNumber: variable.maxNumber,
+      description: variable.description,
+      examples: variable.examples,
+      category: variable.category,
+      promptIds: variable.promptIds,
+      createdAt: variable.createdAt,
+      updatedAt: variable.updatedAt,
+    };
   },
 });
 
@@ -191,6 +245,7 @@ export const getVariablesByBasePattern = query({
   },
   returns: v.array(v.object({
     _id: v.id("variables"),
+    _creationTime: v.number(),
     name: v.string(),
     basePattern: v.string(),
     isNumbered: v.boolean(),
@@ -207,6 +262,48 @@ export const getVariablesByBasePattern = query({
       .query("variables")
       .withIndex("by_base_pattern", (q) => q.eq("basePattern", args.basePattern))
       .collect();
+  },
+});
+
+// Get variables by prompt ID - OPTIMIZED VERSION
+export const getVariablesByPromptId = query({
+  args: {
+    promptId: v.id("prompts"),
+  },
+  returns: v.array(v.object({
+    _id: v.id("variables"),
+    _creationTime: v.number(),
+    name: v.string(),
+    basePattern: v.string(),
+    isNumbered: v.boolean(),
+    maxNumber: v.optional(v.number()),
+    description: v.string(),
+    examples: v.array(v.string()),
+    category: v.string(),
+    promptIds: v.array(v.id("prompts")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })),
+  handler: async (ctx, args) => {
+    // First get the prompt to see what variables it uses
+    const prompt = await ctx.db.get(args.promptId);
+    if (!prompt || !prompt.variables || prompt.variables.length === 0) {
+      return [];
+    }
+    
+    // Then fetch only those specific variables by name (uses index!)
+    const variables = [];
+    for (const varName of prompt.variables) {
+      const variable = await ctx.db
+        .query("variables")
+        .withIndex("by_name", (q) => q.eq("name", varName))
+        .first();
+      if (variable) {
+        variables.push(variable);
+      }
+    }
+    
+    return variables;
   },
 });
 

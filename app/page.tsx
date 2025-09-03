@@ -1,7 +1,7 @@
 "use client";
 
 import { SemanticSearchBox } from "../components/SemanticSearchBox";
-import { CategoryGrid } from "../components/CategoryGrid";
+import { StaticCategoryGrid } from "../components/StaticCategoryGrid";
 
 export default function Home() {
   return (
@@ -77,7 +77,7 @@ export default function Home() {
               Your board has questions, donors need updates, a report is due. We give you the words, tuned to your mission, ready in moments.
             </p>
           </div>
-          <CategoryGrid />
+          <StaticCategoryGrid />
         </div>
       </section>
 

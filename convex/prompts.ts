@@ -137,6 +137,14 @@ export const getPromptById = query({
     complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
     tags: v.array(v.string()),
     description: v.string(),
+    variables: v.optional(v.array(v.string())),
+    requiredDocuments: v.optional(v.array(v.string())),
+    analysisMetadata: v.optional(v.object({
+      variableCount: v.number(),
+      complexityScore: v.number(),
+      additionalContextNeeded: v.boolean(),
+      lastAnalyzed: v.number(),
+    })),
     createdAt: v.number(),
     updatedAt: v.number(),
   })),
@@ -155,13 +163,17 @@ export const getPromptById = query({
       complexity: prompt.complexity,
       tags: prompt.tags,
       description: prompt.description,
+      variables: prompt.variables,
+      requiredDocuments: prompt.requiredDocuments,
+      analysisMetadata: prompt.analysisMetadata,
       createdAt: prompt.createdAt,
       updatedAt: prompt.updatedAt,
     };
   },
 });
 
-// Get all unique categories
+// Get all unique categories - DEPRECATED: Use static data in frontend instead
+// Only kept for potential admin interfaces - DO NOT USE in production frontend
 export const getCategories = query({
   args: {},
   returns: v.array(v.object({
@@ -170,22 +182,41 @@ export const getCategories = query({
     count: v.number(),
   })),
   handler: async (ctx) => {
-    const prompts = await ctx.db.query("prompts").collect();
+    console.warn("⚠️  getCategories query called - this is inefficient. Use static data instead!");
     
-    const categoryMap = new Map<string, Set<string>>();
-    
-    prompts.forEach(prompt => {
-      if (!categoryMap.has(prompt.category)) {
-        categoryMap.set(prompt.category, new Set());
+    // Return static data to avoid any database queries
+    return [
+      {
+        category: "Answer and Assist",
+        subcategories: ["FAQ & Knowledge Base Responses", "Personalized Support & Guidance"],
+        count: 0
+      },
+      {
+        category: "Automate the Admin", 
+        subcategories: ["Automated Communications", "Form & Document Review", "Repetitive Data Processing"],
+        count: 0
+      },
+      {
+        category: "Create and Communicate",
+        subcategories: [
+          "Content Adaptation & Reformatting", "Content Generation from Scratch", "Data Storytelling",
+          "Interactive Content Creation", "Policy & Procedure Documentation", "Script & Narrative Writing",
+          "Structured Report Creation", "Template Filling & Personalization", 
+          "Translation & Accessibility Conversion", "Visual Content Creation"
+        ],
+        count: 0
+      },
+      {
+        category: "Learn and Decide",
+        subcategories: ["Data Analysis & Insights", "Research & Intelligence Gathering", "Strategic Planning & Forecasting"],
+        count: 0
+      },
+      {
+        category: "Sort and Scan",
+        subcategories: ["Application & Candidate Screening", "Content Categorization & Prioritization", "Quality Assessment & Scoring"],
+        count: 0
       }
-      categoryMap.get(prompt.category)!.add(prompt.subcategory);
-    });
-
-    return Array.from(categoryMap.entries()).map(([category, subcategories]) => ({
-      category,
-      subcategories: Array.from(subcategories),
-      count: prompts.filter(p => p.category === category).length,
-    }));
+    ];
   },
 });
 
@@ -232,6 +263,97 @@ export const updatePromptEmbedding = mutation({
       embedding: args.embedding,
       updatedAt: Date.now(),
     });
+  },
+});
+
+// Get prompts by title and complexity for dynamic form
+export const getPromptVariantsByTitle = query({
+  args: { 
+    title: v.string(),
+    complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high"))
+  },
+  returns: v.union(v.null(), v.object({
+    _id: v.id("prompts"),
+    title: v.string(),
+    content: v.string(),
+    complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    category: v.string(),
+    subcategory: v.string(),
+    variables: v.optional(v.array(v.string())),
+    tags: v.array(v.string()),
+    description: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })),
+  handler: async (ctx, args) => {
+    const prompt = await ctx.db
+      .query("prompts")
+      .withIndex("by_complexity", (q) => 
+        q.eq("title", args.title).eq("complexity", args.complexity)
+      )
+      .first();
+    
+    if (!prompt) return null;
+    
+    return {
+      _id: prompt._id,
+      title: prompt.title,
+      content: prompt.content,
+      complexity: prompt.complexity,
+      category: prompt.category,
+      subcategory: prompt.subcategory,
+      variables: prompt.variables,
+      tags: prompt.tags,
+      description: prompt.description,
+      createdAt: prompt.createdAt,
+      updatedAt: prompt.updatedAt,
+    };
+  },
+});
+
+// Get all prompts for migration (simplified structure)
+export const getAllPromptsForMigration = query({
+  args: {},
+  returns: v.array(v.object({
+    _id: v.id("prompts"),
+    title: v.string(),
+    complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    category: v.string(),
+    subcategory: v.string(),
+    variables: v.optional(v.array(v.string())),
+  })),
+  handler: async (ctx) => {
+    const prompts = await ctx.db.query("prompts").collect();
+    return prompts.map(prompt => ({
+      _id: prompt._id,
+      title: prompt.title,
+      complexity: prompt.complexity,
+      category: prompt.category,
+      subcategory: prompt.subcategory,
+      variables: prompt.variables,
+    }));
+  },
+});
+
+// Get all prompts with content for efficient batch processing
+export const getAllPromptsWithContent = query({
+  args: {},
+  returns: v.array(v.object({
+    _id: v.id("prompts"),
+    title: v.string(),
+    content: v.string(),
+    complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    variables: v.optional(v.array(v.string())),
+  })),
+  handler: async (ctx) => {
+    const prompts = await ctx.db.query("prompts").collect();
+    return prompts.map(prompt => ({
+      _id: prompt._id,
+      title: prompt.title,
+      content: prompt.content,
+      complexity: prompt.complexity,
+      variables: prompt.variables,
+    }));
   },
 });
 
@@ -480,6 +602,48 @@ export const getAllPromptsForEmbedding = query({
       subcategory: prompt.subcategory,
       embedding: prompt.embedding,
     }));
+  },
+});
+
+// Clear all prompts (for re-import)
+export const clearAllPrompts = mutation({
+  args: {},
+  returns: v.null(),
+  handler: async (ctx) => {
+    const allPrompts = await ctx.db.query("prompts").collect();
+    
+    for (const prompt of allPrompts) {
+      await ctx.db.delete(prompt._id);
+    }
+  },
+});
+
+// Create a new prompt (simplified for import)
+export const createPrompt = mutation({
+  args: {
+    title: v.string(),
+    content: v.string(),
+    category: v.string(),
+    subcategory: v.string(),
+    complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    tags: v.array(v.string()),
+    description: v.string(),
+  },
+  returns: v.id("prompts"),
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    
+    return await ctx.db.insert("prompts", {
+      title: args.title,
+      content: args.content,
+      category: args.category,
+      subcategory: args.subcategory,
+      complexity: args.complexity,
+      tags: args.tags,
+      description: args.description,
+      createdAt: now,
+      updatedAt: now,
+    });
   },
 });
 

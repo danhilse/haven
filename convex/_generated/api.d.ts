@@ -18,6 +18,7 @@ import type * as myFunctions from "../myFunctions.js";
 import type * as orgProfiles from "../orgProfiles.js";
 import type * as prompts from "../prompts.js";
 import type * as runs from "../runs.js";
+import type * as variables from "../variables.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -33,6 +34,7 @@ declare const fullApi: ApiFromModules<{
   orgProfiles: typeof orgProfiles;
   prompts: typeof prompts;
   runs: typeof runs;
+  variables: typeof variables;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

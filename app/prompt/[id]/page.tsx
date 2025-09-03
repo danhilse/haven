@@ -1,11 +1,11 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
 import { PromptBreadcrumb } from "../../../components/Breadcrumb";
-import { PromptExecutor } from "../../../components/PromptExecutor";
+import { DynamicPromptForm } from "../../../components/DynamicPromptForm";
 
 interface PromptPageProps {
   params: Promise<{ id: string }>;
@@ -14,9 +14,28 @@ interface PromptPageProps {
 export default function PromptPage({ params }: PromptPageProps) {
   const resolvedParams = use(params);
   const [showDetails, setShowDetails] = useState(false);
+  
   const prompt = useQuery(api.prompts.getPromptById, {
     promptId: resolvedParams.id as Id<"prompts">
   });
+  
+  const [selectedComplexity, setSelectedComplexity] = useState<"low" | "medium" | "high">("medium");
+  
+  // Initialize complexity when prompt loads
+  useEffect(() => {
+    if (prompt?.complexity) {
+      setSelectedComplexity(prompt.complexity);
+    }
+  }, [prompt?.complexity]);
+  
+  // Get the prompt variant for the selected complexity to show in details
+  const promptVariantForDetails = useQuery(api.prompts.getPromptVariantsByTitle, {
+    title: prompt?.title || "",
+    complexity: selectedComplexity
+  });
+  
+  // Use the current variant for details, fallback to original prompt
+  const displayPrompt = promptVariantForDetails || prompt;
 
   if (prompt === undefined) {
     return <PromptPageSkeleton />;
@@ -96,12 +115,26 @@ export default function PromptPage({ params }: PromptPageProps) {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Prompt Template */}
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                    Prompt Template
-                  </h2>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      Prompt Template
+                    </h2>
+                    {/* Complexity Selector for Details */}
+                    <select
+                      value={selectedComplexity}
+                      onChange={(e) => setSelectedComplexity(e.target.value as "low" | "medium" | "high")}
+                      className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm
+                                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="low">Simple</option>
+                      <option value="medium">Balanced</option>
+                      <option value="high">Detailed</option>
+                    </select>
+                  </div>
                   <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border max-h-64 overflow-y-auto">
                     <pre className="text-xs text-gray-800 dark:text-gray-200 whitespace-pre-wrap font-mono leading-relaxed">
-                      {prompt.content}
+                      {displayPrompt?.content || prompt.content}
                     </pre>
                   </div>
                 </div>
@@ -176,14 +209,17 @@ export default function PromptPage({ params }: PromptPageProps) {
             </div>
           )}
 
-          {/* Main Focus: Prompt Executor - Auto-expanded */}
-          <PromptExecutor 
+          {/* Main Focus: Dynamic Prompt Form - Auto-expanded */}
+          <DynamicPromptForm 
             promptId={resolvedParams.id as Id<"prompts">}
             prompt={{
               title: prompt.title,
-              content: prompt.content
+              content: prompt.content,
+              variables: prompt.variables
             }}
             autoExpand={true}
+            externalComplexity={selectedComplexity}
+            onComplexityChange={setSelectedComplexity}
           />
         </div>
       </main>
