@@ -7,7 +7,7 @@ The trap here is to market a “prompt library” (tool-centric, inward) versus 
 ## Voice & Tone
 
 *   **Calm, supportive, steady:** Never breathless or “disruptive.”
-*   **Slightly esoteric:** Gentle metaphors (“a compass in crowded waters”) to elevate mood.
+*   **Slightly esoteric:** Occasional gentle metaphors (“a compass in crowded waters”) to elevate mood.
 *   **Practical, direct:** Always pivot back to tangible outcomes: “a grant draft in minutes,” “donor letters that feel human,” etc.
 *   **Avoid jargon:** Don’t say “prompt,” say “ready-made guidance,” “conversation starter,” or “templates tuned to your mission.”
 *   **Agency of the user:** They’re the hero, the tool is the ally.

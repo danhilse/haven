@@ -61,6 +61,7 @@ export function DynamicPromptForm({
   });
 
   const [variableValues, setVariableValues] = useState<VariableValues>({});
+  const [globalVariableValues, setGlobalVariableValues] = useState<VariableValues>({});
 
   const executePrompt = useAction(api.prompts.executePrompt);
   
@@ -73,39 +74,57 @@ export function DynamicPromptForm({
   // Use the current variant if available, otherwise fall back to the original prompt
   const activePrompt = currentPromptVariant || prompt;
   
-  // Get variable metadata for the active prompt - only if we have variables
-  const variableMetadata = useQuery(
+  // Get prompt-specific variable metadata
+  const promptVariables = useQuery(
     api.variables.getVariablesByPromptId, 
-    activePrompt.variables && activePrompt.variables.length > 0
-      ? { promptId: activePrompt._id || promptId }
-      : "skip"
+    activePrompt._id ? { promptId: activePrompt._id } : "skip"
   );
+  
+  // Get global variable metadata
+  const globalVariables = useQuery(api.globalVariables.getGlobalVariables, {});
 
-  // Initialize variable values when active prompt changes
+  // Initialize prompt-specific variable values
   useEffect(() => {
-    if (activePrompt.variables && activePrompt.variables.length > 0) {
+    if (promptVariables && promptVariables.length > 0) {
       const initialValues: VariableValues = {};
-      activePrompt.variables.forEach(varName => {
-        initialValues[varName] = "";
+      promptVariables.forEach(variable => {
+        initialValues[variable.name] = "";
       });
       setVariableValues(initialValues);
     } else {
       setVariableValues({});
     }
-  }, [activePrompt.variables, selectedComplexity]);
+  }, [promptVariables]);
+  
+  // Initialize global variable values
+  useEffect(() => {
+    if (globalVariables && globalVariables.length > 0) {
+      const initialValues: VariableValues = {};
+      globalVariables.forEach(variable => {
+        initialValues[variable.name] = variable.defaultValue || "";
+      });
+      setGlobalVariableValues(initialValues);
+    }
+  }, [globalVariables]);
 
   // Generate the final prompt with variable substitution
   const processedPrompt = useMemo(() => {
     let processed = activePrompt.content;
     
-    // Replace bracketed variables with values
+    // Replace prompt-specific variables
     Object.entries(variableValues).forEach(([varName, value]) => {
       const regex = new RegExp(`\\[${varName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\]`, 'g');
       processed = processed.replace(regex, value || `[${varName}]`);
     });
     
+    // Replace global variables
+    Object.entries(globalVariableValues).forEach(([varName, value]) => {
+      const regex = new RegExp(`\\[${varName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\]`, 'g');
+      processed = processed.replace(regex, value || `[${varName}]`);
+    });
+    
     return processed;
-  }, [activePrompt.content, variableValues]);
+  }, [activePrompt.content, variableValues, globalVariableValues]);
 
   // Estimate token count for input
   const inputTokens = useMemo(() => {
@@ -125,15 +144,148 @@ export function DynamicPromptForm({
       [varName]: value
     }));
   };
+  
+  const handleGlobalVariableChange = (varName: string, value: string) => {
+    setGlobalVariableValues(prev => ({
+      ...prev,
+      [varName]: value
+    }));
+  };
+  
+  // Render input based on type
+  const renderVariableInput = (variable: any, value: string, onChange: (value: string) => void) => {
+    const baseClasses = "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
+    
+    switch (variable.inputType) {
+      case 'long_text':
+        return (
+          <textarea
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={variable.examples?.[0] || `Enter ${variable.questionPrompt}`}
+            rows={3}
+            className={baseClasses}
+          />
+        );
+      
+      case 'select':
+        return (
+          <select
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className={baseClasses}
+          >
+            <option value="">Select...</option>
+            {variable.selectOptions?.map((option: string) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+        );
+      
+      case 'email':
+        return (
+          <input
+            type="email"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={variable.examples?.[0] || 'Enter email address'}
+            className={baseClasses}
+          />
+        );
+      
+      case 'phone':
+        return (
+          <input
+            type="tel"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={variable.examples?.[0] || 'Enter phone number'}
+            className={baseClasses}
+          />
+        );
+      
+      case 'date':
+        return (
+          <input
+            type="date"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className={baseClasses}
+          />
+        );
+      
+      case 'number':
+        return (
+          <input
+            type="number"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={variable.examples?.[0] || 'Enter number'}
+            className={baseClasses}
+          />
+        );
+      
+      case 'currency':
+        return (
+          <div className="relative">
+            <span className="absolute left-3 top-2 text-gray-500">$</span>
+            <input
+              type="number"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder={variable.examples?.[0] || '0.00'}
+              className={`${baseClasses} pl-8`}
+              step="0.01"
+            />
+          </div>
+        );
+      
+      case 'document':
+        return (
+          <div className="space-y-2">
+            <input
+              type="file"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                onChange(file ? file.name : '');
+              }}
+              className={baseClasses}
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {variable.description}
+            </p>
+          </div>
+        );
+      
+      case 'short_text':
+      default:
+        return (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={variable.examples?.[0] || `Enter ${variable.questionPrompt}`}
+            className={baseClasses}
+          />
+        );
+    }
+  };
 
   const handleExecute = async () => {
-    // Check if all required variables are filled
-    const missingVariables = activePrompt.variables?.filter(varName => 
-      !variableValues[varName]?.trim()
-    ) || [];
+    // Check if all required prompt-specific variables are filled
+    const missingPromptVariables = promptVariables?.filter(variable => 
+      variable.isRequired && !variableValues[variable.name]?.trim()
+    ).map(v => v.questionPrompt) || [];
+    
+    // Check if all required global variables are filled
+    const missingGlobalVariables = globalVariables?.filter(variable => 
+      variable.isRequired && !globalVariableValues[variable.name]?.trim()
+    ).map(v => v.questionPrompt) || [];
 
-    if (missingVariables.length > 0) {
-      setError(`Please fill in these required variables: ${missingVariables.join(', ')}`);
+    const allMissingVariables = [...missingPromptVariables, ...missingGlobalVariables];
+    
+    if (allMissingVariables.length > 0) {
+      setError(`Please fill in these required fields: ${allMissingVariables.join(', ')}`);
       return;
     }
 
@@ -249,42 +401,80 @@ export function DynamicPromptForm({
           </div>
         </div>
 
-        {/* Dynamic Variables Section */}
-        {activePrompt.variables && activePrompt.variables.length > 0 && (
+        {/* Output Description */}
+        {activePrompt.outputDescription && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+              What You'll Receive
+            </h3>
+            <p className="text-blue-800 dark:text-blue-200">
+              {activePrompt.outputDescription}
+            </p>
+          </div>
+        )}
+
+        {/* Global Variables Section */}
+        {globalVariables && globalVariables.length > 0 && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              Template Variables
+              Organization Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {activePrompt.variables.map(varName => {
-                const metadata = variableMetadata?.find(v => v.name === varName);
-                return (
-                  <div key={varName}>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {varName.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())} *
-                    </label>
-                    {metadata?.description && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                        {metadata.description}
-                      </p>
-                    )}
-                    <input
-                      type="text"
-                      value={variableValues[varName] || ""}
-                      onChange={(e) => handleVariableChange(varName, e.target.value)}
-                      placeholder={metadata?.examples?.[0] || `Enter ${varName.toLowerCase()}`}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md
-                                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
-                                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    {metadata?.examples && metadata.examples.length > 1 && (
-                      <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        Examples: {metadata.examples.slice(1).join(', ')}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              {globalVariables.map(variable => (
+                <div key={variable.name}>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {variable.questionPrompt} {variable.isRequired && '*'}
+                  </label>
+                  {variable.description && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                      {variable.description}
+                    </p>
+                  )}
+                  {renderVariableInput(
+                    variable,
+                    globalVariableValues[variable.name] || "",
+                    (value) => handleGlobalVariableChange(variable.name, value)
+                  )}
+                  {variable.examples && variable.examples.length > 1 && (
+                    <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      Examples: {variable.examples.slice(1).join(', ')}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Prompt-Specific Variables Section */}
+        {promptVariables && promptVariables.length > 0 && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              Specific Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {promptVariables.map(variable => (
+                <div key={variable.name}>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {variable.questionPrompt} {variable.isRequired && '*'}
+                  </label>
+                  {variable.description && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                      {variable.description}
+                    </p>
+                  )}
+                  {renderVariableInput(
+                    variable,
+                    variableValues[variable.name] || "",
+                    (value) => handleVariableChange(variable.name, value)
+                  )}
+                  {variable.examples && variable.examples.length > 1 && (
+                    <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      Examples: {variable.examples.slice(1).join(', ')}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -390,7 +580,7 @@ export function DynamicPromptForm({
         {/* Execute Button */}
         <button
           onClick={handleExecute}
-          disabled={isExecuting || !orgProfile.name.trim() || !orgProfile.mission.trim()}
+          disabled={isExecuting}
           className="w-full flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 
                     disabled:bg-gray-400 disabled:cursor-not-allowed
                     text-white font-medium rounded-lg transition-colors duration-200"
@@ -416,7 +606,7 @@ export function DynamicPromptForm({
           <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
             <OutputViewer
               content={result}
-              title={`Generated: ${activePrompt.title} (${selectedComplexity})`}
+              title={activePrompt.outputDescription || `Generated: ${activePrompt.title} (${selectedComplexity})`}
               metadata={resultMetadata}
             />
           </div>

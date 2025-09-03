@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as execution from "../execution.js";
+import type * as globalVariables from "../globalVariables.js";
 import type * as myFunctions from "../myFunctions.js";
 import type * as orgProfiles from "../orgProfiles.js";
 import type * as prompts from "../prompts.js";
@@ -30,6 +31,7 @@ import type * as variables from "../variables.js";
  */
 declare const fullApi: ApiFromModules<{
   execution: typeof execution;
+  globalVariables: typeof globalVariables;
   myFunctions: typeof myFunctions;
   orgProfiles: typeof orgProfiles;
   prompts: typeof prompts;

@@ -1,0 +1,55 @@
+{
+  "testDate": "2025-09-03T14:01:56.534Z",
+  "promptsProcessed": 3,
+  "averageConfidence": 0.9499999999999998,
+  "results": [
+    {
+      "originalTitle": "Board member questions about governance",
+      "enhancedTitle": "Board Governance Q&A Support",
+      "enhancedDescription": "Easily address board members' governance questions with confidence and clarity. Ensure your board operates smoothly and effectively.",
+      "outputDescription": "Well-organized responses to governance questions, tailored to your organization's needs.",
+      "enhancedTags": [
+        "board members",
+        "governance",
+        "questions",
+        "support",
+        "communications"
+      ],
+      "suggestedComplexity": "medium",
+      "confidence": 0.95,
+      "modelUsed": "gpt-4o-mini"
+    },
+    {
+      "originalTitle": "Board member questions about governance",
+      "enhancedTitle": "Board Governance Q&A Support",
+      "enhancedDescription": "Get clear answers to board governance questions, ensuring your organization stays compliant and informed.",
+      "outputDescription": "Concise responses to governance questions, complete with action items and references to your specific policies.",
+      "enhancedTags": [
+        "board members",
+        "governance",
+        "compliance",
+        "policies",
+        "questions"
+      ],
+      "suggestedComplexity": "low",
+      "confidence": 0.95,
+      "modelUsed": "gpt-4o-mini"
+    },
+    {
+      "originalTitle": "Board member questions about governance",
+      "enhancedTitle": "Board Governance Q&A Support",
+      "enhancedDescription": "Help your board members get clear answers to governance questions, ensuring everyone understands their roles and responsibilities.",
+      "outputDescription": "Concise responses to board governance questions that clarify roles and align with your organization's policies.",
+      "enhancedTags": [
+        "board members",
+        "governance",
+        "questions",
+        "policies",
+        "procedures"
+      ],
+      "suggestedComplexity": "medium",
+      "confidence": 0.95,
+      "modelUsed": "gpt-4o-mini"
+    }
+  ]
+}

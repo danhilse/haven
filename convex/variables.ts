@@ -1,166 +1,119 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-// Create or update a variable in the database
-export const createOrUpdateVariable = mutation({
+// Create a prompt-specific variable
+export const createPromptVariable = mutation({
   args: {
     name: v.string(),
-    basePattern: v.string(),
-    isNumbered: v.boolean(),
-    maxNumber: v.optional(v.number()),
+    promptId: v.id("prompts"),
     description: v.string(),
+    questionPrompt: v.string(),
+    inputType: v.string(),
     examples: v.array(v.string()),
     category: v.string(),
-    promptIds: v.array(v.id("prompts")),
-    suggestedInputType: v.optional(v.string()),
+    isRequired: v.boolean(),
+    sortOrder: v.number(),
+    grouping: v.optional(v.string()),
+    selectOptions: v.optional(v.array(v.string())),
     validationRules: v.optional(v.array(v.string())),
   },
   returns: v.id("variables"),
   handler: async (ctx, args) => {
-    // Check if variable already exists
-    const existing = await ctx.db
-      .query("variables")
-      .withIndex("by_name", (q) => q.eq("name", args.name))
-      .first();
-
     const now = Date.now();
-
-    if (existing) {
-      // Update existing variable
-      await ctx.db.patch(existing._id, {
-        basePattern: args.basePattern,
-        isNumbered: args.isNumbered,
-        maxNumber: args.maxNumber,
-        description: args.description,
-        examples: args.examples,
-        category: args.category,
-        promptIds: args.promptIds,
-        updatedAt: now,
-      });
-      return existing._id;
-    } else {
-      // Create new variable
-      return await ctx.db.insert("variables", {
-        name: args.name,
-        basePattern: args.basePattern,
-        isNumbered: args.isNumbered,
-        maxNumber: args.maxNumber,
-        description: args.description,
-        examples: args.examples,
-        category: args.category,
-        promptIds: args.promptIds,
-        createdAt: now,
-        updatedAt: now,
-      });
-    }
+    
+    return await ctx.db.insert("variables", {
+      name: args.name,
+      promptId: args.promptId,
+      description: args.description,
+      questionPrompt: args.questionPrompt,
+      inputType: args.inputType,
+      examples: args.examples,
+      category: args.category,
+      isRequired: args.isRequired,
+      sortOrder: args.sortOrder,
+      grouping: args.grouping,
+      selectOptions: args.selectOptions,
+      validationRules: args.validationRules,
+      createdAt: now,
+      updatedAt: now,
+    });
   },
 });
 
-// Batch create/update multiple variables
-export const batchCreateVariables = mutation({
+// Batch create prompt-specific variables
+export const batchCreatePromptVariables = mutation({
   args: {
     variables: v.array(v.object({
       name: v.string(),
-      basePattern: v.string(),
-      isNumbered: v.boolean(),
-      maxNumber: v.optional(v.number()),
+      promptId: v.id("prompts"),
       description: v.string(),
+      questionPrompt: v.string(),
+      inputType: v.string(),
       examples: v.array(v.string()),
       category: v.string(),
-      promptIds: v.array(v.id("prompts")),
-      suggestedInputType: v.optional(v.string()),
+      isRequired: v.boolean(),
+      sortOrder: v.number(),
+      grouping: v.optional(v.string()),
+      selectOptions: v.optional(v.array(v.string())),
       validationRules: v.optional(v.array(v.string())),
     }))
   },
   returns: v.array(v.id("variables")),
   handler: async (ctx, args) => {
     const results = [];
+    const now = Date.now();
 
     for (const variable of args.variables) {
-      // Check if variable already exists
-      const existing = await ctx.db
-        .query("variables")
-        .withIndex("by_name", (q) => q.eq("name", variable.name))
-        .first();
-
-      const now = Date.now();
-
-      if (existing) {
-        // Update existing variable
-        await ctx.db.patch(existing._id, {
-          basePattern: variable.basePattern,
-          isNumbered: variable.isNumbered,
-          maxNumber: variable.maxNumber,
-          description: variable.description,
-          examples: variable.examples,
-          category: variable.category,
-          promptIds: variable.promptIds,
-          updatedAt: now,
-        });
-        results.push(existing._id);
-      } else {
-        // Create new variable
-        const variableId = await ctx.db.insert("variables", {
-          name: variable.name,
-          basePattern: variable.basePattern,
-          isNumbered: variable.isNumbered,
-          maxNumber: variable.maxNumber,
-          description: variable.description,
-          examples: variable.examples,
-          category: variable.category,
-          promptIds: variable.promptIds,
-          createdAt: now,
-          updatedAt: now,
-        });
-        results.push(variableId);
-      }
+      const variableId = await ctx.db.insert("variables", {
+        name: variable.name,
+        promptId: variable.promptId,
+        description: variable.description,
+        questionPrompt: variable.questionPrompt,
+        inputType: variable.inputType,
+        examples: variable.examples,
+        category: variable.category,
+        isRequired: variable.isRequired,
+        sortOrder: variable.sortOrder,
+        grouping: variable.grouping,
+        selectOptions: variable.selectOptions,
+        validationRules: variable.validationRules,
+        createdAt: now,
+        updatedAt: now,
+      });
+      results.push(variableId);
     }
 
     return results;
   },
 });
 
-// Get all variables with pagination
-export const getVariables = query({
+// Get variables for a specific prompt (sorted by sortOrder)
+export const getVariablesByPrompt = query({
   args: {
-    limit: v.optional(v.number()),
+    promptId: v.id("prompts"),
   },
   returns: v.array(v.object({
     _id: v.id("variables"),
     _creationTime: v.number(),
     name: v.string(),
-    basePattern: v.string(),
-    isNumbered: v.boolean(),
-    maxNumber: v.optional(v.number()),
+    promptId: v.id("prompts"),
     description: v.string(),
+    questionPrompt: v.string(),
+    inputType: v.string(),
     examples: v.array(v.string()),
     category: v.string(),
-    promptIds: v.array(v.id("prompts")),
+    isRequired: v.boolean(),
+    sortOrder: v.number(),
+    selectOptions: v.optional(v.array(v.string())),
+    validationRules: v.optional(v.array(v.string())),
     createdAt: v.number(),
     updatedAt: v.number(),
   })),
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 50;
-    
-    const variables = await ctx.db
+    return await ctx.db
       .query("variables")
-      .order("desc")
-      .take(limit);
-    
-    return variables.map(variable => ({
-      _id: variable._id,
-      _creationTime: variable._creationTime,
-      name: variable.name,
-      basePattern: variable.basePattern,
-      isNumbered: variable.isNumbered,
-      maxNumber: variable.maxNumber,
-      description: variable.description,
-      examples: variable.examples,
-      category: variable.category,
-      promptIds: variable.promptIds,
-      createdAt: variable.createdAt,
-      updatedAt: variable.updatedAt,
-    }));
+      .withIndex("by_sort_order", (q) => q.eq("promptId", args.promptId))
+      .collect();
   },
 });
 
@@ -173,13 +126,16 @@ export const getVariablesByCategory = query({
     _id: v.id("variables"),
     _creationTime: v.number(),
     name: v.string(),
-    basePattern: v.string(),
-    isNumbered: v.boolean(),
-    maxNumber: v.optional(v.number()),
+    promptId: v.id("prompts"),
     description: v.string(),
+    questionPrompt: v.string(),
+    inputType: v.string(),
     examples: v.array(v.string()),
     category: v.string(),
-    promptIds: v.array(v.id("prompts")),
+    isRequired: v.boolean(),
+    sortOrder: v.number(),
+    selectOptions: v.optional(v.array(v.string())),
+    validationRules: v.optional(v.array(v.string())),
     createdAt: v.number(),
     updatedAt: v.number(),
   })),
@@ -202,13 +158,16 @@ export const getVariableByName = query({
       _id: v.id("variables"),
       _creationTime: v.number(),
       name: v.string(),
-      basePattern: v.string(),
-      isNumbered: v.boolean(),
-      maxNumber: v.optional(v.number()),
+      promptId: v.id("prompts"),
       description: v.string(),
+      questionPrompt: v.string(),
+      inputType: v.string(),
       examples: v.array(v.string()),
       category: v.string(),
-      promptIds: v.array(v.id("prompts")),
+      isRequired: v.boolean(),
+      sortOrder: v.number(),
+      selectOptions: v.optional(v.array(v.string())),
+      validationRules: v.optional(v.array(v.string())),
       createdAt: v.number(),
       updatedAt: v.number(),
     })
@@ -221,51 +180,46 @@ export const getVariableByName = query({
     
     if (!variable) return null;
     
-    return {
-      _id: variable._id,
-      _creationTime: variable._creationTime,
-      name: variable.name,
-      basePattern: variable.basePattern,
-      isNumbered: variable.isNumbered,
-      maxNumber: variable.maxNumber,
-      description: variable.description,
-      examples: variable.examples,
-      category: variable.category,
-      promptIds: variable.promptIds,
-      createdAt: variable.createdAt,
-      updatedAt: variable.updatedAt,
-    };
+    return variable;
   },
 });
 
-// Get variables by base pattern (useful for numbered variables)
-export const getVariablesByBasePattern = query({
+// Get variables by prompt (with name filter)
+export const getVariablesByPromptAndName = query({
   args: {
-    basePattern: v.string(),
-  },
-  returns: v.array(v.object({
-    _id: v.id("variables"),
-    _creationTime: v.number(),
+    promptId: v.id("prompts"),
     name: v.string(),
-    basePattern: v.string(),
-    isNumbered: v.boolean(),
-    maxNumber: v.optional(v.number()),
-    description: v.string(),
-    examples: v.array(v.string()),
-    category: v.string(),
-    promptIds: v.array(v.id("prompts")),
-    createdAt: v.number(),
-    updatedAt: v.number(),
-  })),
+  },
+  returns: v.union(
+    v.null(),
+    v.object({
+      _id: v.id("variables"),
+      _creationTime: v.number(),
+      name: v.string(),
+      promptId: v.id("prompts"),
+      description: v.string(),
+      questionPrompt: v.string(),
+      inputType: v.string(),
+      examples: v.array(v.string()),
+      category: v.string(),
+      isRequired: v.boolean(),
+      sortOrder: v.number(),
+      selectOptions: v.optional(v.array(v.string())),
+      validationRules: v.optional(v.array(v.string())),
+      createdAt: v.number(),
+      updatedAt: v.number(),
+    })
+  ),
   handler: async (ctx, args) => {
     return await ctx.db
       .query("variables")
-      .withIndex("by_base_pattern", (q) => q.eq("basePattern", args.basePattern))
-      .collect();
+      .withIndex("by_prompt", (q) => q.eq("promptId", args.promptId))
+      .filter((q) => q.eq(q.field("name"), args.name))
+      .first();
   },
 });
 
-// Get variables by prompt ID - OPTIMIZED VERSION
+// Get variables by prompt ID - UPDATED for new schema
 export const getVariablesByPromptId = query({
   args: {
     promptId: v.id("prompts"),
@@ -274,36 +228,24 @@ export const getVariablesByPromptId = query({
     _id: v.id("variables"),
     _creationTime: v.number(),
     name: v.string(),
-    basePattern: v.string(),
-    isNumbered: v.boolean(),
-    maxNumber: v.optional(v.number()),
+    promptId: v.id("prompts"),
     description: v.string(),
+    questionPrompt: v.string(),
+    inputType: v.string(),
     examples: v.array(v.string()),
     category: v.string(),
-    promptIds: v.array(v.id("prompts")),
+    isRequired: v.boolean(),
+    sortOrder: v.number(),
+    selectOptions: v.optional(v.array(v.string())),
+    validationRules: v.optional(v.array(v.string())),
     createdAt: v.number(),
     updatedAt: v.number(),
   })),
   handler: async (ctx, args) => {
-    // First get the prompt to see what variables it uses
-    const prompt = await ctx.db.get(args.promptId);
-    if (!prompt || !prompt.variables || prompt.variables.length === 0) {
-      return [];
-    }
-    
-    // Then fetch only those specific variables by name (uses index!)
-    const variables = [];
-    for (const varName of prompt.variables) {
-      const variable = await ctx.db
-        .query("variables")
-        .withIndex("by_name", (q) => q.eq("name", varName))
-        .first();
-      if (variable) {
-        variables.push(variable);
-      }
-    }
-    
-    return variables;
+    return await ctx.db
+      .query("variables")
+      .withIndex("by_prompt", (q) => q.eq("promptId", args.promptId))
+      .collect();
   },
 });
 
@@ -312,60 +254,64 @@ export const getVariableStats = query({
   args: {},
   returns: v.object({
     totalVariables: v.number(),
-    numberedVariables: v.number(),
+    requiredVariables: v.number(),
     categoryCounts: v.record(v.string(), v.number()),
-    averageExamplesPerVariable: v.number(),
+    inputTypeCounts: v.record(v.string(), v.number()),
+    averageVariablesPerPrompt: v.number(),
   }),
   handler: async (ctx) => {
     const variables = await ctx.db.query("variables").collect();
     
     const totalVariables = variables.length;
-    const numberedVariables = variables.filter(v => v.isNumbered).length;
+    const requiredVariables = variables.filter(v => v.isRequired).length;
     
     const categoryCounts: Record<string, number> = {};
-    let totalExamples = 0;
+    const inputTypeCounts: Record<string, number> = {};
+    const promptIds = new Set<string>();
     
     variables.forEach(variable => {
       categoryCounts[variable.category] = (categoryCounts[variable.category] || 0) + 1;
-      totalExamples += variable.examples.length;
+      inputTypeCounts[variable.inputType] = (inputTypeCounts[variable.inputType] || 0) + 1;
+      promptIds.add(variable.promptId);
     });
     
     return {
       totalVariables,
-      numberedVariables,
+      requiredVariables,
       categoryCounts,
-      averageExamplesPerVariable: totalVariables > 0 ? totalExamples / totalVariables : 0,
+      inputTypeCounts,
+      averageVariablesPerPrompt: promptIds.size > 0 ? totalVariables / promptIds.size : 0,
     };
   },
 });
 
-// Update prompt with variable information
-export const updatePromptWithVariables = mutation({
+// Clear all variables for a prompt (for re-processing)
+export const clearPromptVariables = mutation({
   args: {
     promptId: v.id("prompts"),
-    variables: v.array(v.string()),
-    requiredDocuments: v.optional(v.array(v.string())),
-    analysisMetadata: v.optional(v.object({
-      variableCount: v.number(),
-      complexityScore: v.number(),
-      additionalContextNeeded: v.boolean(),
-      lastAnalyzed: v.number(),
-    })),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const now = Date.now();
+    const variables = await ctx.db
+      .query("variables")
+      .withIndex("by_prompt", (q) => q.eq("promptId", args.promptId))
+      .collect();
     
-    await ctx.db.patch(args.promptId, {
-      variables: args.variables,
-      requiredDocuments: args.requiredDocuments,
-      analysisMetadata: args.analysisMetadata || {
-        variableCount: args.variables.length,
-        complexityScore: 1.0,
-        additionalContextNeeded: false,
-        lastAnalyzed: now,
-      },
-      updatedAt: now,
-    });
+    for (const variable of variables) {
+      await ctx.db.delete(variable._id);
+    }
+  },
+});
+
+// Clear all variables (for full re-processing)
+export const clearAllVariables = mutation({
+  args: {},
+  returns: v.null(),
+  handler: async (ctx) => {
+    const allVariables = await ctx.db.query("variables").collect();
+    
+    for (const variable of allVariables) {
+      await ctx.db.delete(variable._id);
+    }
   },
 });

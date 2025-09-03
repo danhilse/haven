@@ -1,0 +1,608 @@
+{
+  "testDate": "2025-09-03T15:28:10.628Z",
+  "promptsProcessed": 5,
+  "totalGlobalVariables": 7,
+  "totalPromptVariables": 38,
+  "averageConfidence": 0.97,
+  "results": [
+    {
+      "promptId": "j97exrhyfkc9bv2v7jzwsw74hn7pt0g5",
+      "title": "Board member questions about governance",
+      "complexity": "high",
+      "extractedVariables": {
+        "promptSpecific": [],
+        "global": [
+          "ORGANIZATION_NAME"
+        ],
+        "documents": [
+          "DOCUMENT_DOCUMENT",
+          "DOCUMENT_GRANT",
+          "DOCUMENT_BUDGET",
+          "DOCUMENT_POLICY",
+          "DOCUMENT_PROCEDURE",
+          "DOCUMENT_HANDBOOK"
+        ]
+      },
+      "enhancedVariables": [
+        {
+          "name": "DOCUMENT_DOCUMENT",
+          "questionPrompt": "Could you please upload any relevant governance documents that the board should review?",
+          "description": "Upload any documents related to governance, such as bylaws or meeting minutes.",
+          "inputType": "document",
+          "examples": [
+            "Bylaws.pdf",
+            "Board Meeting Minutes.docx",
+            "Governance Policies.pdf"
+          ],
+          "isRequired": true
+        },
+        {
+          "name": "DOCUMENT_GRANT",
+          "questionPrompt": "Do you have any grant documents that outline governance requirements or expectations?",
+          "description": "Upload grant documents that may contain governance-related information.",
+          "inputType": "document",
+          "examples": [
+            "Grant Agreement.pdf",
+            "Funding Guidelines.docx"
+          ],
+          "isRequired": false
+        },
+        {
+          "name": "DOCUMENT_BUDGET",
+          "questionPrompt": "Please provide the current budget document that reflects the organization's financial governance.",
+          "description": "Upload the latest budget document for review.",
+          "inputType": "document",
+          "examples": [
+            "2023_Budget.xlsx",
+            "Annual Financial Plan.pdf"
+          ],
+          "isRequired": true
+        },
+        {
+          "name": "DOCUMENT_POLICY",
+          "questionPrompt": "What policies related to governance does your organization have? Please upload them here.",
+          "description": "Upload any governance policies such as conflict of interest or board member responsibilities.",
+          "inputType": "document",
+          "examples": [
+            "Conflict_of_Interest_Policy.pdf",
+            "Board_Member_Responsibilities.docx"
+          ],
+          "isRequired": true
+        },
+        {
+          "name": "DOCUMENT_PROCEDURE",
+          "questionPrompt": "Can you upload any procedural documents that guide board operations?",
+          "description": "Upload documents that outline procedures for board meetings or decision-making.",
+          "inputType": "document",
+          "examples": [
+            "Board_Meeting_Procedure.docx",
+            "Decision_Making_Protocol.pdf"
+          ],
+          "isRequired": false
+        },
+        {
+          "name": "DOCUMENT_HANDBOOK",
+          "questionPrompt": "Is there a board handbook available? If so, please upload it.",
+          "description": "Upload the board handbook that provides guidance to board members.",
+          "inputType": "document",
+          "examples": [
+            "Board_Handbook.pdf",
+            "Orientation_Guide.docx"
+          ],
+          "isRequired": false
+        }
+      ],
+      "outputDescription": "You will receive a structured overview of the governance documents submitted, along with any specific questions or clarifications needed.",
+      "confidence": 0.95
+    },
+    {
+      "promptId": "j97dg3eb0vdxm7b77nfj4qvcrh7pvp5f",
+      "title": "Board member questions about governance",
+      "complexity": "low",
+      "extractedVariables": {
+        "promptSpecific": [],
+        "global": [
+          "ORGANIZATION_NAME"
+        ],
+        "documents": []
+      },
+      "enhancedVariables": [],
+      "outputDescription": "Generated content personalized for your organization",
+      "confidence": 1
+    },
+    {
+      "promptId": "j97cpbme7dhhvbatbaqasyjwbd7ptjke",
+      "title": "Board member questions about governance",
+      "complexity": "medium",
+      "extractedVariables": {
+        "promptSpecific": [],
+        "global": [
+          "ORGANIZATION_NAME"
+        ],
+        "documents": [
+          "DOCUMENT_DOCUMENT",
+          "DOCUMENT_POLICY",
+          "DOCUMENT_PROCEDURE",
+          "DOCUMENT_MANUAL"
+        ]
+      },
+      "enhancedVariables": [
+        {
+          "name": "DOCUMENT_DOCUMENT",
+          "questionPrompt": "Please upload your primary governing document(s) such as your Articles of Incorporation or current Bylaws that define the board’s authority and structure.",
+          "description": "The organization's high-level governing document(s) that establish legal status, board composition, quorum rules, amendment process, and primary governance framework.",
+          "inputType": "document",
+          "examples": [
+            "BYLAWS_CommunityHealthCenter_2022.pdf",
+            "Articles_of_Incorporation_CommunityArts_2018.pdf",
+            "Consolidated_Governance_Documents_2023.pdf"
+          ],
+          "isRequired": true,
+          "grouping": "governance_documents"
+        },
+        {
+          "name": "DOCUMENT_POLICY",
+          "questionPrompt": "Please upload key board and organizational policies (e.g., conflict of interest, whistleblower, records retention, gift acceptance) that guide board decisions and compliance.",
+          "description": "Formal written policies which set standards for board conduct, ethics, financial controls, transparency, and legal compliance.",
+          "inputType": "document",
+          "examples": [
+            "Conflict_of_Interest_Policy_CommunityHealthCenter.pdf",
+            "Whistleblower_and_Hotline_Policy_2021.docx",
+            "Gift_Acceptance_Policy_and_Procedures.pdf"
+          ],
+          "isRequired": true,
+          "grouping": "governance_documents"
+        },
+        {
+          "name": "DOCUMENT_PROCEDURE",
+          "questionPrompt": "Upload any procedural documents or step-by-step guides the board uses (e.g., meeting procedures, nomination process, minutes templates, conflict resolution steps).",
+          "description": "Operational procedures and workflows that translate policies into actionable steps for board officers, staff, and committee chairs.",
+          "inputType": "document",
+          "examples": [
+            "Board_Meeting_Procedure_and_Roll_Call_Checklist.pdf",
+            "Nomination_and_Onboarding_Procedure_2020.docx",
+            "Minutes_Template_and_Approval_Workflow.xlsx"
+          ],
+          "isRequired": true,
+          "grouping": "governance_documents"
+        },
+        {
+          "name": "DOCUMENT_MANUAL",
+          "questionPrompt": "Please upload any governance manuals or board handbooks that provide orientation, roles/responsibilities, committee charters, and governance best practices.",
+          "description": "Comprehensive handbooks or manuals for board members that combine bylaws, policies, role descriptions, committee guidance, and onboarding materials.",
+          "inputType": "document",
+          "examples": [
+            "Board_Member_Handbook_CommunityArts_2024.pdf",
+            "Governance_Manual_With_Committee_Charters.docx",
+            "Board_Onboarding_Packet_Updated_2023.zip"
+          ],
+          "isRequired": false,
+          "grouping": "governance_documents"
+        }
+      ],
+      "outputDescription": "The system will use the uploaded governing documents, policies, procedures, and manuals to provide tailored, governance-focused answers for board members — explaining roles, compliance obligations, meeting processes, and how the organization's bylaws and policies apply to common board questions.",
+      "confidence": 0.95
+    },
+    {
+      "promptId": "j97b4nvh5wh1jjp6x98tsrjvax7pt2sp",
+      "title": "Donor inquiries about programs and impact",
+      "complexity": "high",
+      "extractedVariables": {
+        "promptSpecific": [
+          "DONOR_NAME",
+          "SPECIFIC_ACHIEVEMENT",
+          "MISSION_FOCUS",
+          "CONTACT_INFORMATION",
+          "PROGRAM_LOCATION",
+          "DATE",
+          "TIME",
+          "STAFF_NAME",
+          "STAFF_TITLE",
+          "NUMBER",
+          "PERCENTAGE",
+          "KEY_OUTCOME_METRIC",
+          "BENEFICIARY_FIRST_NAME",
+          "BRIEF_TESTIMONIAL_QUOTE",
+          "STRATEGIC_GOAL",
+          "TIMEFRAME",
+          "SPECIFIC_PROGRAM_EXAMPLES",
+          "FUNDRAISING_ROI",
+          "CHARITY_RATING",
+          "RATING_ORGANIZATION",
+          "CFO_NAME"
+        ],
+        "global": [
+          "ORGANIZATION_NAME",
+          "MISSION_STATEMENT",
+          "PROGRAM_NAME"
+        ],
+        "documents": [
+          "DOCUMENT_ATTACH",
+          "DOCUMENT_DOCUMENT",
+          "DOCUMENT_REPORT",
+          "DOCUMENT_BUDGET",
+          "DOCUMENT_FINANCIAL_STATEMENT",
+          "DOCUMENT_ANNUAL_REPORT",
+          "DOCUMENT_TESTIMONIAL"
+        ]
+      },
+      "enhancedVariables": [
+        {
+          "name": "DONOR_NAME",
+          "questionPrompt": "What name should we use to address the donor (individual or organization)?",
+          "description": "Preferred salutation or name for personalizing responses to the donor.",
+          "inputType": "short_text",
+          "examples": [
+            "Jane Alvarez",
+            "The Thompson Family Foundation",
+            "Mr. David Kim"
+          ],
+          "isRequired": true,
+          "grouping": "recipient_info"
+        },
+        {
+          "name": "SPECIFIC_ACHIEVEMENT",
+          "questionPrompt": "Which specific achievement or milestone would you like to highlight for the donor?",
+          "description": "A concrete accomplishment tied to the program or impact the donor is asking about.",
+          "inputType": "long_text",
+          "examples": [
+            "Graduated 150 students from our literacy program in 2024",
+            "Completed construction of a clean-water well in Riverbend community",
+            "Launched a job-readiness apprenticeship for 75 young adults"
+          ],
+          "isRequired": false,
+          "grouping": "program_impact"
+        },
+        {
+          "name": "MISSION_FOCUS",
+          "questionPrompt": "In one sentence, how do you describe your organization's core mission focus?",
+          "description": "A concise mission statement to frame responses about programs and impact.",
+          "inputType": "short_text",
+          "examples": [
+            "We provide after-school STEM education to underserved youth.",
+            "We deliver emergency food and shelter to families in crisis.",
+            "We protect local wetlands and promote community stewardship."
+          ],
+          "isRequired": true,
+          "grouping": "organization_info"
+        },
+        {
+          "name": "CONTACT_INFORMATION",
+          "questionPrompt": "Who should the donor contact for follow-up, and how can they reach them?",
+          "description": "Primary contact details (name, email, phone) for donor follow-up or questions.",
+          "inputType": "long_text",
+          "examples": [
+            "Ava Martinez, Donor Relations Manager — ava@hopeworks.org, (555) 123-4567",
+            "Donor Support — donors@greenfuture.org; main line: (555) 987-6543"
+          ],
+          "isRequired": true,
+          "grouping": "contact_info"
+        },
+        {
+          "name": "PROGRAM_LOCATION",
+          "questionPrompt": "Where is the program or activity taking place (city, region, or site)?",
+          "description": "Specific geographic location(s) of the program referenced in the inquiry.",
+          "inputType": "short_text",
+          "examples": [
+            "Northside Community Center, Austin, TX",
+            "Rural villages in Kasese District, Uganda",
+            "Our downtown transitional housing site — 240 Elm Street"
+          ],
+          "isRequired": false,
+          "grouping": "program_impact"
+        },
+        {
+          "name": "DATE",
+          "questionPrompt": "If applicable, what date should we reference (event, report date, or milestone)?",
+          "description": "Relevant date connected to the inquiry (use YYYY-MM-DD where possible).",
+          "inputType": "date",
+          "examples": [
+            "2025-06-15",
+            "2024-12-31",
+            "2025-03-01"
+          ],
+          "isRequired": false,
+          "grouping": "timing"
+        },
+        {
+          "name": "TIME",
+          "questionPrompt": "If you need to schedule a call or meeting, what time(s) work best (include timezone)?",
+          "description": "Preferred time for follow-up communications, including timezone.",
+          "inputType": "short_text",
+          "examples": [
+            "10:00 AM CT on 2025-06-20",
+            "Afternoons, 2–4 PM PST",
+            "Weekdays between 9 AM and 12 PM ET"
+          ],
+          "isRequired": false,
+          "grouping": "timing"
+        },
+        {
+          "name": "STAFF_NAME",
+          "questionPrompt": "Which staff member should be named in the response (who will speak about the program)?",
+          "description": "Full name of staff member quoted or listed as follow-up contact.",
+          "inputType": "short_text",
+          "examples": [
+            "Maya Chen",
+            "Luis Ortega",
+            "Dr. Priya Nair"
+          ],
+          "isRequired": false,
+          "grouping": "contact_info"
+        },
+        {
+          "name": "STAFF_TITLE",
+          "questionPrompt": "What is that staff member's title (for proper attribution)?",
+          "description": "Official role/title of the staff member named (e.g., Program Director).",
+          "inputType": "short_text",
+          "examples": [
+            "Director of Programs",
+            "Senior Impact Analyst",
+            "Chief Program Officer"
+          ],
+          "isRequired": false,
+          "grouping": "contact_info"
+        },
+        {
+          "name": "NUMBER",
+          "questionPrompt": "If you want to cite a numeric figure, what exact number should we include?",
+          "description": "Any single numeric value relevant to impact (counts, participants served, units distributed).",
+          "inputType": "number",
+          "examples": [
+            "150",
+            "42",
+            "3,200"
+          ],
+          "isRequired": false,
+          "grouping": "program_impact"
+        },
+        {
+          "name": "PERCENTAGE",
+          "questionPrompt": "If using a percentage to show results, what percent should we report?",
+          "description": "Percentage metric to communicate outcomes or change (enter as a whole number where possible).",
+          "inputType": "number",
+          "examples": [
+            "87",
+            "35",
+            "12"
+          ],
+          "isRequired": false,
+          "grouping": "program_impact"
+        },
+        {
+          "name": "KEY_OUTCOME_METRIC",
+          "questionPrompt": "Which key outcome metric best reflects program success (and how would you describe it briefly)?",
+          "description": "Primary measurable outcome used for impact reporting (e.g., graduation rate, employment rate).",
+          "inputType": "short_text",
+          "examples": [
+            "High school graduation rate: 94%",
+            "Household food security improved by 60%",
+            "Average income increase of $1,200/year"
+          ],
+          "isRequired": true,
+          "grouping": "program_impact"
+        },
+        {
+          "name": "BENEFICIARY_FIRST_NAME",
+          "questionPrompt": "If sharing a personal story, what is the beneficiary's first name we can use?",
+          "description": "First name for a beneficiary quoted in communications (ensure consent is obtained).",
+          "inputType": "short_text",
+          "examples": [
+            "Fatima",
+            "James",
+            "Lucía"
+          ],
+          "isRequired": false,
+          "grouping": "stories"
+        },
+        {
+          "name": "BRIEF_TESTIMONIAL_QUOTE",
+          "questionPrompt": "Please provide a short (1–2 sentence) testimonial quote from a beneficiary or partner.",
+          "description": "A concise, attributed quote that humanizes impact (avoid sensitive details).",
+          "inputType": "long_text",
+          "examples": [
+            "'Thanks to the job program, I found stable work and can support my family,' — Maria",
+            "'The tutoring helped my son read at grade level in six months,' — Parent of student"
+          ],
+          "isRequired": false,
+          "grouping": "stories"
+        },
+        {
+          "name": "STRATEGIC_GOAL",
+          "questionPrompt": "Which strategic goal does this program support (briefly state the goal)?",
+          "description": "Organizational strategic objective linked to the program or activity.",
+          "inputType": "short_text",
+          "examples": [
+            "Increase youth graduation rates by 15% in target neighborhoods",
+            "Expand clean-water access to 10 additional villages",
+            "Reduce chronic homelessness in the county by 20%"
+          ],
+          "isRequired": false,
+          "grouping": "strategy"
+        },
+        {
+          "name": "TIMEFRAME",
+          "questionPrompt": "What timeframe applies to the achievement or plan (e.g., FY2024, Q1 2025, 2023–2026)?",
+          "description": "Specific reporting or planning period relevant to the donor's inquiry.",
+          "inputType": "short_text",
+          "examples": [
+            "FY2024",
+            "Q3 2025",
+            "2023–2026 strategic plan"
+          ],
+          "isRequired": false,
+          "grouping": "timing"
+        },
+        {
+          "name": "SPECIFIC_PROGRAM_EXAMPLES",
+          "questionPrompt": "Please list 1–3 specific program examples or activities you want us to reference.",
+          "description": "Concrete program names or activities that illustrate how funding is used.",
+          "inputType": "long_text",
+          "examples": [
+            "Mobile health clinics offering vaccinations in West County",
+            "After-school robotics club at Lincoln Middle School",
+            "Micro-grant program for women entrepreneurs in Region A"
+          ],
+          "isRequired": true,
+          "grouping": "program_impact"
+        },
+        {
+          "name": "FUNDRAISING_ROI",
+          "questionPrompt": "If available, what fundraising return-on-investment or cost-per-beneficiary figure should we share?",
+          "description": "Financial efficiency metric showing fundraising impact (e.g., $1 invested yields $4 in services).",
+          "inputType": "short_text",
+          "examples": [
+            "$1 supports $3.50 worth of services",
+            "Cost per beneficiary: $125",
+            "Every $100 donated provides meals for 20 children"
+          ],
+          "isRequired": false,
+          "grouping": "financials"
+        },
+        {
+          "name": "CHARITY_RATING",
+          "questionPrompt": "Do you have an official charity rating you'd like us to reference (e.g., 4-star)?",
+          "description": "Public rating label indicating organizational evaluation by a rating body.",
+          "inputType": "short_text",
+          "examples": [
+            "4-star",
+            "Top-Rated Charity 2024",
+            "Gold Seal"
+          ],
+          "isRequired": false,
+          "grouping": "credibility"
+        },
+        {
+          "name": "RATING_ORGANIZATION",
+          "questionPrompt": "Which organization provided that rating (if applicable)?",
+          "description": "Name of the evaluator that issued the charity rating.",
+          "inputType": "short_text",
+          "examples": [
+            "Charity Navigator",
+            "GuideStar / Candid",
+            "BBB Wise Giving Alliance"
+          ],
+          "isRequired": false,
+          "grouping": "credibility"
+        },
+        {
+          "name": "CFO_NAME",
+          "questionPrompt": "If the donor requests financial sign-off, which finance leader should be listed (name and title)?",
+          "description": "Name and title of the organization's CFO or finance contact for financial questions.",
+          "inputType": "short_text",
+          "examples": [
+            "Alex Reed, Chief Financial Officer",
+            "Tanya Brooks, VP Finance"
+          ],
+          "isRequired": false,
+          "grouping": "contact_info"
+        },
+        {
+          "name": "DOCUMENT_ATTACH",
+          "questionPrompt": "Do you want to attach any documents to support this response? If yes, please upload below.",
+          "description": "Placeholder to indicate whether supplemental documents will be provided; actual files uploaded in document fields below.",
+          "inputType": "select",
+          "examples": [
+            "Yes",
+            "No"
+          ],
+          "isRequired": false,
+          "grouping": "documents",
+          "selectOptions": [
+            "Yes",
+            "No"
+          ]
+        },
+        {
+          "name": "DOCUMENT_DOCUMENT",
+          "questionPrompt": "Upload any general supporting documents (e.g., briefing notes or program summaries).",
+          "description": "General file uploads to provide background material related to the inquiry.",
+          "inputType": "document",
+          "examples": [
+            "Program one-page summary.pdf",
+            "Briefing_notes_May2025.docx"
+          ],
+          "isRequired": false,
+          "grouping": "documents"
+        },
+        {
+          "name": "DOCUMENT_REPORT",
+          "questionPrompt": "Upload the full impact or evaluation report you'd like us to reference (if available).",
+          "description": "Comprehensive program or evaluation reports to substantiate impact claims.",
+          "inputType": "document",
+          "examples": [
+            "2024 Impact Report.pdf",
+            "CommunityEvaluation_Report_2023.pdf"
+          ],
+          "isRequired": false,
+          "grouping": "documents"
+        },
+        {
+          "name": "DOCUMENT_BUDGET",
+          "questionPrompt": "Please upload the program budget or budget summary you want to share with the donor.",
+          "description": "Budget documents showing how funds are allocated for the program(s) in question.",
+          "inputType": "document",
+          "examples": [
+            "Program_Budget_2025.xlsx",
+            "Budget_Summary_YouthProgram.pdf"
+          ],
+          "isRequired": false,
+          "grouping": "documents"
+        },
+        {
+          "name": "DOCUMENT_FINANCIAL_STATEMENT",
+          "questionPrompt": "Upload recent financial statements or audited accounts if the donor requests financial verification.",
+          "description": "Organization-level financial statements or audited reports for transparency.",
+          "inputType": "document",
+          "examples": [
+            "Audited_Financials_2024.pdf",
+            "Statement_of_Activities_2024.xlsx"
+          ],
+          "isRequired": false,
+          "grouping": "documents"
+        },
+        {
+          "name": "DOCUMENT_ANNUAL_REPORT",
+          "questionPrompt": "Upload your latest annual report to include in the donor response (if available).",
+          "description": "Public annual report summarizing impact, leadership, and financials.",
+          "inputType": "document",
+          "examples": [
+            "Annual_Report_2024.pdf",
+            "Year_in_Review_2023.pdf"
+          ],
+          "isRequired": false,
+          "grouping": "documents"
+        },
+        {
+          "name": "DOCUMENT_TESTIMONIAL",
+          "questionPrompt": "Upload any signed testimonial releases or media consent forms for beneficiary quotes or photos.",
+          "description": "Consent forms or signed releases permitting use of beneficiary testimonials or images.",
+          "inputType": "document",
+          "examples": [
+            "Consent_Form_Maria_2025.pdf",
+            "MediaRelease_James.docx"
+          ],
+          "isRequired": false,
+          "grouping": "documents"
+        }
+      ],
+      "outputDescription": "A structured set of donor response inputs: personalized salutation, program/location details, key impact metrics and narratives, staff contact for follow-up, optional financial and credibility figures, and any supporting documents—ready for drafting a tailored donor reply about programs and impact.",
+      "confidence": 0.95
+    },
+    {
+      "promptId": "j973fcb099gryxwhh3435gtjkx7ptq4p",
+      "title": "Donor inquiries about programs and impact",
+      "complexity": "low",
+      "extractedVariables": {
+        "promptSpecific": [],
+        "global": [
+          "ORGANIZATION_NAME"
+        ],
+        "documents": []
+      },
+      "enhancedVariables": [],
+      "outputDescription": "Generated content personalized for your organization",
+      "confidence": 1
+    }
+  ]
+}

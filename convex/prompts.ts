@@ -16,6 +16,7 @@ export const getPromptsByCategory = query({
     _creationTime: v.number(),
     title: v.string(),
     description: v.string(),
+    outputDescription: v.optional(v.string()),
     tags: v.array(v.string()),
     category: v.string(),
     subcategory: v.string(),
@@ -55,6 +56,7 @@ export const getPromptsByCategory = query({
       _creationTime: prompt._creationTime,
       title: prompt.title,
       description: prompt.description,
+      outputDescription: prompt.outputDescription,
       tags: prompt.tags,
       category: prompt.category,
       subcategory: prompt.subcategory,
@@ -78,6 +80,7 @@ export const searchPrompts = query({
     _creationTime: v.number(),
     title: v.string(),
     description: v.string(),
+    outputDescription: v.optional(v.string()),
     tags: v.array(v.string()),
     category: v.string(),
     subcategory: v.string(),
@@ -116,6 +119,7 @@ export const searchPrompts = query({
       _creationTime: prompt._creationTime,
       title: prompt.title,
       description: prompt.description,
+      outputDescription: prompt.outputDescription,
       tags: prompt.tags,
       category: prompt.category,
       subcategory: prompt.subcategory,
@@ -137,10 +141,13 @@ export const getPromptById = query({
     complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
     tags: v.array(v.string()),
     description: v.string(),
+    outputDescription: v.optional(v.string()),
     variables: v.optional(v.array(v.string())),
+    globalVariables: v.optional(v.array(v.string())),
     requiredDocuments: v.optional(v.array(v.string())),
     analysisMetadata: v.optional(v.object({
       variableCount: v.number(),
+      globalVariableCount: v.optional(v.number()),
       complexityScore: v.number(),
       additionalContextNeeded: v.boolean(),
       lastAnalyzed: v.number(),
@@ -163,7 +170,9 @@ export const getPromptById = query({
       complexity: prompt.complexity,
       tags: prompt.tags,
       description: prompt.description,
+      outputDescription: prompt.outputDescription,
       variables: prompt.variables,
+      globalVariables: prompt.globalVariables,
       requiredDocuments: prompt.requiredDocuments,
       analysisMetadata: prompt.analysisMetadata,
       createdAt: prompt.createdAt,
@@ -230,6 +239,7 @@ export const addPrompt = mutation({
     complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
     tags: v.array(v.string()),
     description: v.string(),
+    outputDescription: v.optional(v.string()),
     embedding: v.optional(v.array(v.number())),
   },
   returns: v.id("prompts"),
@@ -244,6 +254,7 @@ export const addPrompt = mutation({
       complexity: args.complexity,
       tags: args.tags,
       description: args.description,
+      outputDescription: args.outputDescription,
       embedding: args.embedding,
       createdAt: now,
       updatedAt: now,
@@ -266,6 +277,42 @@ export const updatePromptEmbedding = mutation({
   },
 });
 
+// Update prompt with metadata from enhanced extraction
+export const updatePromptMetadata = mutation({
+  args: {
+    promptId: v.id("prompts"),
+    updates: v.object({
+      description: v.optional(v.string()),
+      summaryDescription: v.optional(v.string()),
+      variables: v.optional(v.array(v.string())),
+      globalVariables: v.optional(v.array(v.string())),
+      outputDescription: v.optional(v.string()),
+      requiredDocuments: v.optional(v.array(v.string())),
+      analysisMetadata: v.optional(v.object({
+        variableCount: v.number(),
+        globalVariableCount: v.optional(v.number()),
+        complexityScore: v.number(),
+        additionalContextNeeded: v.boolean(),
+        lastAnalyzed: v.number(),
+      })),
+    }),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    
+    // Filter out undefined values and add updatedAt
+    const updateData = Object.fromEntries(
+      Object.entries(args.updates).filter(([_, value]) => value !== undefined)
+    );
+    
+    await ctx.db.patch(args.promptId, {
+      ...updateData,
+      updatedAt: now,
+    });
+  },
+});
+
 // Get prompts by title and complexity for dynamic form
 export const getPromptVariantsByTitle = query({
   args: { 
@@ -280,6 +327,8 @@ export const getPromptVariantsByTitle = query({
     category: v.string(),
     subcategory: v.string(),
     variables: v.optional(v.array(v.string())),
+    globalVariables: v.optional(v.array(v.string())),
+    outputDescription: v.optional(v.string()),
     tags: v.array(v.string()),
     description: v.string(),
     createdAt: v.number(),
@@ -303,6 +352,8 @@ export const getPromptVariantsByTitle = query({
       category: prompt.category,
       subcategory: prompt.subcategory,
       variables: prompt.variables,
+      globalVariables: prompt.globalVariables,
+      outputDescription: prompt.outputDescription,
       tags: prompt.tags,
       description: prompt.description,
       createdAt: prompt.createdAt,
@@ -321,6 +372,7 @@ export const getAllPromptsForMigration = query({
     category: v.string(),
     subcategory: v.string(),
     variables: v.optional(v.array(v.string())),
+    globalVariables: v.optional(v.array(v.string())),
   })),
   handler: async (ctx) => {
     const prompts = await ctx.db.query("prompts").collect();
@@ -331,6 +383,7 @@ export const getAllPromptsForMigration = query({
       category: prompt.category,
       subcategory: prompt.subcategory,
       variables: prompt.variables,
+      globalVariables: prompt.globalVariables,
     }));
   },
 });
@@ -344,6 +397,7 @@ export const getAllPromptsWithContent = query({
     content: v.string(),
     complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
     variables: v.optional(v.array(v.string())),
+    globalVariables: v.optional(v.array(v.string())),
   })),
   handler: async (ctx) => {
     const prompts = await ctx.db.query("prompts").collect();
@@ -353,6 +407,39 @@ export const getAllPromptsWithContent = query({
       content: prompt.content,
       complexity: prompt.complexity,
       variables: prompt.variables,
+      globalVariables: prompt.globalVariables,
+    }));
+  },
+});
+
+// Get all prompts (for description enhancement scripts)
+export const getAllPrompts = query({
+  args: {},
+  returns: v.array(v.object({
+    _id: v.id("prompts"),
+    title: v.string(),
+    content: v.string(),
+    category: v.string(),
+    subcategory: v.string(),
+    complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    tags: v.array(v.string()),
+    description: v.string(),
+    outputDescription: v.optional(v.string()),
+    summaryDescription: v.optional(v.string()),
+  })),
+  handler: async (ctx) => {
+    const prompts = await ctx.db.query("prompts").collect();
+    return prompts.map(prompt => ({
+      _id: prompt._id,
+      title: prompt.title,
+      content: prompt.content,
+      category: prompt.category,
+      subcategory: prompt.subcategory,
+      complexity: prompt.complexity,
+      tags: prompt.tags,
+      description: prompt.description,
+      outputDescription: prompt.outputDescription,
+      summaryDescription: prompt.summaryDescription,
     }));
   },
 });
@@ -389,6 +476,7 @@ export const create = mutation({
     complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
     tags: v.array(v.string()),
     description: v.string(),
+    outputDescription: v.optional(v.string()),
     embedding: v.optional(v.array(v.number())),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -403,6 +491,7 @@ export const create = mutation({
       complexity: args.complexity,
       tags: args.tags,
       description: args.description,
+      outputDescription: args.outputDescription,
       embedding: args.embedding,
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
@@ -422,6 +511,7 @@ export const getPromptByTitleAndComplexity = query({
     title: v.string(),
     content: v.string(),
     description: v.string(),
+    outputDescription: v.optional(v.string()),
     tags: v.array(v.string()),
     category: v.string(),
     subcategory: v.string(),
@@ -443,6 +533,7 @@ export const getPromptByTitleAndComplexity = query({
       title: prompt.title,
       content: prompt.content,
       description: prompt.description,
+      outputDescription: prompt.outputDescription,
       tags: prompt.tags,
       category: prompt.category,
       subcategory: prompt.subcategory,
@@ -469,6 +560,7 @@ export const semanticSearch = action({
       _creationTime: v.number(),
       title: v.string(),
       description: v.string(),
+      outputDescription: v.optional(v.string()),
       tags: v.array(v.string()),
       category: v.string(),
       subcategory: v.string(),
@@ -518,6 +610,7 @@ export const semanticSearch = action({
       _creationTime: prompt._creationTime,
       title: prompt.title,
       description: prompt.description,
+      outputDescription: prompt.outputDescription,
       tags: prompt.tags,
       category: prompt.category,
       subcategory: prompt.subcategory,
@@ -628,6 +721,7 @@ export const createPrompt = mutation({
     complexity: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
     tags: v.array(v.string()),
     description: v.string(),
+    outputDescription: v.optional(v.string()),
   },
   returns: v.id("prompts"),
   handler: async (ctx, args) => {
@@ -641,6 +735,7 @@ export const createPrompt = mutation({
       complexity: args.complexity,
       tags: args.tags,
       description: args.description,
+      outputDescription: args.outputDescription,
       createdAt: now,
       updatedAt: now,
     });
