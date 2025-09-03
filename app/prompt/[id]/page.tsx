@@ -99,15 +99,6 @@ export default function PromptPage({ params }: PromptPageProps) {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
-          {/* Main Title - Concise */}
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-              {prompt.title}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              {prompt.description}
-            </p>
-          </div>
 
           {/* Collapsible Details Section */}
           {showDetails && (
@@ -215,6 +206,8 @@ export default function PromptPage({ params }: PromptPageProps) {
             prompt={{
               title: prompt.title,
               content: prompt.content,
+              description: prompt.description,
+              outputDescription: prompt.outputDescription,
               variables: prompt.variables
             }}
             autoExpand={true}
