@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useImperativeHandle, forwardRef } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import Link from "next/link";
+import { PromptCard } from "./PromptCard";
 
 interface CategoryGridProps {
   className?: string;
+}
+
+export interface StaticCategoryGridRef {
+  resetToSubcategories: () => void;
 }
 
 interface SparkFormStep {
@@ -104,7 +109,7 @@ const CATEGORIES = [
   }
 ];
 
-export function StaticCategoryGrid({ className = "" }: CategoryGridProps) {
+export const StaticCategoryGrid = forwardRef<StaticCategoryGridRef, CategoryGridProps>(({ className = "" }, ref) => {
   const [currentStep, setCurrentStep] = useState<SparkFormStep>({ type: 'subcategories' });
   const [fadeClass, setFadeClass] = useState('opacity-100');
 
@@ -121,6 +126,15 @@ export function StaticCategoryGrid({ className = "" }: CategoryGridProps) {
       handleStepTransition({ type: 'subcategories' });
     }
   };
+
+  // Expose reset function to parent via ref
+  useImperativeHandle(ref, () => ({
+    resetToSubcategories: () => {
+      if (currentStep.type !== 'subcategories') {
+        handleStepTransition({ type: 'subcategories' });
+      }
+    }
+  }), [currentStep.type]);
 
   // Create flattened and shuffled subcategory list (memoized to prevent re-shuffling)
   const allSubcategories = useMemo(() => {
@@ -184,7 +198,7 @@ export function StaticCategoryGrid({ className = "" }: CategoryGridProps) {
       )}
     </div>
   );
-}
+});
 
 // Step 1: Subcategories Grid
 interface SubcategoriesGridStepProps {
@@ -283,38 +297,9 @@ function TemplatesStep({ category, subcategory }: TemplatesStepProps) {
         </p>
       </div>
       
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {prompts.map((prompt) => (
-          <div
-            key={prompt._id}
-            className="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
-                       rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
-          >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              {prompt.title}
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              {prompt.description}
-            </p>
-            <div className="flex flex-wrap gap-2 mb-4">
-              <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 
-                              text-blue-800 dark:text-blue-200 rounded">
-                {prompt.category}
-              </span>
-              {prompt.subcategory && (
-                <span className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 
-                                text-gray-600 dark:text-gray-300 rounded">
-                  {prompt.subcategory}
-                </span>
-              )}
-            </div>
-            <Link 
-              href={`/prompt/${prompt._id}`}
-              className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
-            >
-              Start this conversation →
-            </Link>
-          </div>
+          <PromptCard key={prompt._id} prompt={prompt} />
         ))}
       </div>
     </div>
@@ -328,17 +313,25 @@ function TemplatesStepSkeleton() {
         <div className="h-8 bg-gray-200 dark:bg-gray-600 rounded w-48 mx-auto mb-2"></div>
         <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-32 mx-auto"></div>
       </div>
-      <div className="space-y-6">
-        {[...Array(3)].map((_, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(6)].map((_, i) => (
           <div key={i} className="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
             <div className="animate-pulse">
-              <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-3/4 mb-2"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full mb-4"></div>
               <div className="flex gap-2 mb-4">
                 <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-16"></div>
                 <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-20"></div>
               </div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-24"></div>
+              <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-3/4 mb-3"></div>
+              <div className="space-y-2 mb-4">
+                <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-5/6"></div>
+              </div>
+              <div className="flex gap-2 mb-4">
+                <div className="h-5 bg-gray-200 dark:bg-gray-600 rounded w-12"></div>
+                <div className="h-5 bg-gray-200 dark:bg-gray-600 rounded w-16"></div>
+                <div className="h-5 bg-gray-200 dark:bg-gray-600 rounded w-14"></div>
+              </div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-32"></div>
             </div>
           </div>
         ))}

@@ -1,95 +1,205 @@
 "use client";
 
+import { useState, useRef } from "react";
+import { useAction, useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
 import { SemanticSearchBox } from "../components/SemanticSearchBox";
-import { StaticCategoryGrid } from "../components/StaticCategoryGrid";
+import {
+  StaticCategoryGrid,
+  StaticCategoryGridRef,
+} from "../components/StaticCategoryGrid";
+import { PromptCard } from "../components/PromptCard";
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const categoryGridRef = useRef<StaticCategoryGridRef>(null);
+  // Semantic search action
+  const semanticSearch = useAction(api.prompts.semanticSearch);
+
+  // Regular search query
+  const regularSearchResults = useQuery(
+    api.prompts.searchPrompts,
+    searchQuery &&
+      searchQuery.trim().length > 0 &&
+      searchQuery.trim().length <= 10
+      ? {
+          query: searchQuery.trim(),
+          limit: 20,
+        }
+      : "skip",
+  );
+
+  const handleSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults(null);
+      setSearchQuery("");
+      return;
+    }
+
+    setSearchQuery(query);
+    setIsSearching(true);
+
+    // Reset category grid to subcategories view when search is performed
+    categoryGridRef.current?.resetToSubcategories();
+
+    try {
+      if (query.trim().length > 10) {
+        // Use semantic search for longer queries
+        const results = await semanticSearch({
+          query: query.trim(),
+          limit: 20,
+        });
+        setSearchResults(results);
+      } else {
+        // Use regular search for shorter queries - results will come from useQuery
+        setSearchResults({ results: regularSearchResults || [] });
+      }
+    } catch (error) {
+      console.error("Search failed:", error);
+      setSearchResults({ results: [] });
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Update search results when regular search results change
+  if (
+    searchQuery &&
+    searchQuery.trim().length <= 10 &&
+    regularSearchResults &&
+    !isSearching
+  ) {
+    if (!searchResults || searchResults.results !== regularSearchResults) {
+      setSearchResults({ results: regularSearchResults });
+    }
+  }
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Haven
+      {/* Hero Section - Adaptive Height */}
+      <section
+        className={`${!searchResults ? "min-h-screen flex items-center justify-center" : "py-16"} bg-white dark:bg-gray-800 transition-all duration-300`}
+      >
+        <div className="text-center max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+            Get help with any nonprofit task.
           </h1>
-        </div>
-      </header>
+          <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
+            Stop staring at blank pages. Start with templates that actually
+            understand nonprofit work.
+          </p>
 
-      {/* Hero Section */}
-      <section className="bg-white dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-              Your quiet strategist
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
-              Start stronger on every task—from donor letters to grant drafts—so you can focus on the mission, not the busywork.
-            </p>
-            
-            {/* Main Semantic Search */}
-            <div className="mb-8">
-              <SemanticSearchBox
-                placeholder="What do you need help with today?"
-                className="max-w-2xl mx-auto"
-              />
-            </div>
-
-            {/* Primary CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/search?semantic=true"
-                className="inline-flex items-center justify-center px-8 py-3 
-                          bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg
-                          transition-colors duration-200"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-                Find your next answer
-              </a>
-              <a
-                href="#categories"
-                className="inline-flex items-center justify-center px-8 py-3 
-                          bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 
-                          text-gray-900 dark:text-gray-100 font-medium rounded-lg
-                          transition-colors duration-200"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                        d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Explore the library
-              </a>
-            </div>
+          {/* Main Semantic Search */}
+          <div className="mb-8">
+            <SemanticSearchBox
+              placeholder="What are you working on?"
+              className="max-w-2xl mx-auto"
+              onSearch={handleSearch}
+              showLiveSearch={false}
+              isSearching={isSearching}
+            />
           </div>
         </div>
       </section>
 
-      {/* Categories Section */}
+      {/* Search Results Section */}
+      {searchResults && (
+        <section className="py-16 bg-gray-50 dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-8">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  {isSearching
+                    ? "Searching..."
+                    : searchResults.results?.length > 0
+                      ? `Found ${searchResults.results.length} result${searchResults.results.length === 1 ? "" : "s"}`
+                      : "No results found"}
+                </h2>
+                <button
+                  onClick={() => {
+                    setSearchResults(null);
+                    setSearchQuery("");
+                  }}
+                  className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  Clear search
+                </button>
+              </div>
+
+              {searchResults.parsedQuery && (
+                <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
+                    <strong>Understanding:</strong>{" "}
+                    {searchResults.parsedQuery.context}
+                  </p>
+                  {searchResults.parsedQuery.category && (
+                    <p className="text-xs text-blue-600 dark:text-blue-300">
+                      Category: {searchResults.parsedQuery.category} • Intent:{" "}
+                      {searchResults.parsedQuery.intentType}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {isSearching ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
+                  >
+                    <div className="animate-pulse space-y-4">
+                      <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-3/4"></div>
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded"></div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-5/6"></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : searchResults.results?.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {searchResults.results.map((prompt: any) => (
+                  <PromptCard key={prompt._id} prompt={prompt} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <div className="text-gray-500 dark:text-gray-400">
+                  <svg
+                    className="mx-auto h-16 w-16 mb-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  <h3 className="text-xl font-medium mb-3">No results found</h3>
+                  <p className="text-sm max-w-md mx-auto mb-4">
+                    Try describing what you need differently or be more specific
+                    about your situation.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Categories Section - Always visible as footer */}
       <section id="categories" className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-              Clarity on demand
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Your board has questions, donors need updates, a report is due. We give you the words, tuned to your mission, ready in moments.
-            </p>
-          </div>
-          <StaticCategoryGrid />
+          <StaticCategoryGrid ref={categoryGridRef} />
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-500 dark:text-gray-400">
-            <p>Haven - The work is hard enough. Let us give you a head start.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
-

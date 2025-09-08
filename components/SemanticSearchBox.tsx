@@ -10,6 +10,7 @@ interface SemanticSearchBoxProps {
   onSearch?: (query: string) => void;
   debounceMs?: number;
   showLiveSearch?: boolean;
+  isSearching?: boolean;
 }
 
 export function SemanticSearchBox({ 
@@ -18,14 +19,18 @@ export function SemanticSearchBox({
   className = "",
   onSearch,
   debounceMs = 500,
-  showLiveSearch = true
+  showLiveSearch = true,
+  isSearching = false
 }: SemanticSearchBoxProps) {
   const [query, setQuery] = useState(initialValue);
-  const [isSearching, setIsSearching] = useState(false);
+  const [internalSearching, setInternalSearching] = useState(false);
   const router = useRouter();
 
+  // Use external isSearching prop if provided, otherwise use internal state
+  const showSearching = isSearching || internalSearching;
+
   const handleSearch = useCallback((searchQuery: string) => {
-    setIsSearching(false);
+    setInternalSearching(false);
     if (onSearch) {
       onSearch(searchQuery);
     } else {
@@ -47,14 +52,14 @@ export function SemanticSearchBox({
       return; // Don't search for very short semantic queries
     }
 
-    setIsSearching(true);
+    setInternalSearching(true);
     const timeoutId = setTimeout(() => {
       handleSearch(query.trim());
     }, debounceMs);
 
     return () => {
       clearTimeout(timeoutId);
-      setIsSearching(false);
+      setInternalSearching(false);
     };
   }, [query, debounceMs, handleSearch, showLiveSearch, onSearch]);
 
@@ -88,14 +93,14 @@ export function SemanticSearchBox({
         />
         <button
           type="submit"
-          disabled={!query.trim()}
+          disabled={!query.trim() || showSearching}
           className="absolute right-2 bottom-2 
                      p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200
                      disabled:opacity-50 disabled:cursor-not-allowed
                      bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600
                      transition-colors"
         >
-          {isSearching && showLiveSearch ? (
+          {showSearching ? (
             <div className="w-5 h-5">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-500 dark:border-gray-400"></div>
             </div>
@@ -108,24 +113,14 @@ export function SemanticSearchBox({
         </button>
       </div>
       
-      <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-        <div className="flex items-start space-x-1">
-          <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p>
-            Describe your nonprofit's situation or communication needs. 
-            For example: "I need to write a thank you email to major donors after our annual fundraising gala"
-          </p>
-        </div>
+      <div className="mt-2 text-center">
+        <a 
+          href="#categories" 
+          className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 underline underline-offset-2"
+        >
+          browse library
+        </a>
       </div>
-      
-      {query && (
-        <div className="absolute top-full left-0 right-0 mt-1 text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 p-2 rounded">
-          Press Enter to find templates that match your description
-        </div>
-      )}
     </form>
   );
 }

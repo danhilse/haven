@@ -64,11 +64,49 @@ function SearchContent() {
   // Semantic search action
   const semanticSearch = useAction(api.prompts.semanticSearch);
 
-  // Regular keyword search results
+  // Trigger search on initial page load if there's a query in URL
+  useEffect(() => {
+    console.log('Initial load effect - initialQuery:', initialQuery);
+    console.log('Initial load effect - isSemanticSearch:', isSemanticSearch);
+    
+    if (initialQuery && initialQuery.trim().length > 0) {
+      console.log('Setting query to:', initialQuery);
+      setQuery(initialQuery);
+      
+      // Trigger search immediately if conditions are met
+      if (isSemanticSearch && initialQuery.trim().length > 10) {
+        console.log('Triggering initial semantic search');
+        setIsLoadingSemantic(true);
+        semanticSearch({
+          query: initialQuery.trim(),
+          limit: 20,
+        }).then(results => {
+          console.log('Initial semantic search results:', results);
+          setSemanticResults(results);
+          setIsLoadingSemantic(false);
+        }).catch(error => {
+          console.error('Initial semantic search failed:', error);
+          setIsLoadingSemantic(false);
+        });
+      } else {
+        console.log('Not triggering semantic search - conditions not met');
+      }
+    } else {
+      console.log('No initial query found');
+    }
+  }, [initialQuery, isSemanticSearch, semanticSearch]);
+
+  // Use the current query state OR initial query if state is empty
+  const currentQuery = query || initialQuery;
+  
+  // Regular keyword search results - run if not semantic OR if semantic but query too short
+  const shouldRunRegularSearch = currentQuery && currentQuery.trim().length > 0 && 
+    (!isSemanticSearch || (isSemanticSearch && currentQuery.trim().length <= 10));
+    
   const keywordSearchResults = useQuery(
     api.prompts.searchPrompts,
-    query && !isSemanticSearch ? {
-      query,
+    shouldRunRegularSearch ? {
+      query: currentQuery.trim(),
       filters: Object.keys(filters).length > 0 ? filters : undefined,
       limit: 50
     } : "skip"
@@ -76,10 +114,10 @@ function SearchContent() {
 
   // Handle semantic search
   useEffect(() => {
-    if (isSemanticSearch && query && query.length > 10) {
+    if (isSemanticSearch && query && query.trim().length > 10) {
       setIsLoadingSemantic(true);
       semanticSearch({
-        query,
+        query: query.trim(),
         limit: 20,
         filters: Object.keys(filters).length > 0 ? filters : undefined,
       }).then(results => {
@@ -95,7 +133,7 @@ function SearchContent() {
   }, [query, isSemanticSearch, filters, semanticSearch]);
 
   // Determine which results to show
-  const searchResults = isSemanticSearch ? 
+  const searchResults = (isSemanticSearch && currentQuery.trim().length > 10) ? 
     (isLoadingSemantic ? undefined : semanticResults?.results) : 
     keywordSearchResults;
 
@@ -143,7 +181,7 @@ function SearchContent() {
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
           {isSemanticSearch ? (
             <SemanticSearchBox
-              initialValue={query}
+              initialValue={currentQuery}
               onSearch={handleSearch}
               placeholder="Describe what you're looking for..."
               showLiveSearch={true}
@@ -151,7 +189,7 @@ function SearchContent() {
             />
           ) : (
             <SearchBox
-              initialValue={query}
+              initialValue={currentQuery}
               onSearch={handleSearch}
               placeholder="Search for ready-made guidance..."
               showLiveSearch={true}
@@ -162,11 +200,11 @@ function SearchContent() {
 
         {/* Results */}
         <div>
-          {query ? (
+          {currentQuery ? (
             <SearchResults 
               results={searchResults} 
-              query={query} 
-              isSemanticSearch={isSemanticSearch}
+              query={currentQuery} 
+              isSemanticSearch={isSemanticSearch && currentQuery.trim().length > 10}
               parsedQuery={semanticResults?.parsedQuery}
             />
           ) : (

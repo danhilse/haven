@@ -589,33 +589,34 @@ export const semanticSearch = action({
       limit: args.limit ?? 20,
     });
     
-    // 4. Group by title and pick medium complexity variant (or first available)
+    // 4. Get full documents for the search results and group by title
     const uniquePrompts = new Map<string, any>();
     
-    searchResults.forEach(result => {
-      const doc = result as any; // Type assertion for full document
-      const existing = uniquePrompts.get(doc.title);
-      if (!existing || doc.complexity === 'medium' || 
-          (existing.complexity !== 'medium' && doc.complexity === 'high')) {
-        uniquePrompts.set(doc.title, {
-          ...doc,
+    for (const result of searchResults) {
+      // Vector search returns { _id, _score }, need to get full document
+      const fullDoc = await ctx.runQuery(api.prompts.getPromptById, { promptId: result._id });
+      if (!fullDoc) continue;
+      
+      const existing = uniquePrompts.get(fullDoc.title);
+      if (!existing || fullDoc.complexity === 'medium' || 
+          (existing.complexity !== 'medium' && fullDoc.complexity === 'high')) {
+        const promptWithSimilarity = {
+          _id: fullDoc._id,
+          _creationTime: fullDoc._creationTime,
+          title: fullDoc.title,
+          description: fullDoc.description,
+          outputDescription: fullDoc.outputDescription,
+          tags: fullDoc.tags,
+          category: fullDoc.category,
+          subcategory: fullDoc.subcategory,
           similarity: result._score
-        });
+        };
+        uniquePrompts.set(fullDoc.title, promptWithSimilarity);
       }
-    });
+    }
     
     // 5. Return results with similarity scores
-    const results = Array.from(uniquePrompts.values()).map(prompt => ({
-      _id: prompt._id,
-      _creationTime: prompt._creationTime,
-      title: prompt.title,
-      description: prompt.description,
-      outputDescription: prompt.outputDescription,
-      tags: prompt.tags,
-      category: prompt.category,
-      subcategory: prompt.subcategory,
-      similarity: prompt.similarity,
-    }));
+    const results = Array.from(uniquePrompts.values());
     
     return {
       results,
