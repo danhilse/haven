@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useAction, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
+import { useRouter } from "next/navigation";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
-import { OutputViewer } from "./OutputViewer";
+import { GENERATION_STORAGE_KEY, PromptGenerationPayload } from "@/lib/types";
 import { StepIndicator } from "./StepIndicator";
 import { VariableStep } from "./VariableStep";
 import { ConfirmationStep } from "./ConfirmationStep";
@@ -62,9 +63,9 @@ export function MultiStepPromptForm({
   const [pendingComplexity, setPendingComplexity] = useState<"low" | "medium" | "high">("medium");
   const [isExpanded, setIsExpanded] = useState(autoExpand);
   const [isExecuting, setIsExecuting] = useState(false);
-  const [result, setResult] = useState<string | null>(null);
-  const [resultMetadata, setResultMetadata] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const router = useRouter();
   
   // Use external complexity if provided, otherwise use internal state
   const [internalComplexity, setInternalComplexity] = useState<"low" | "medium" | "high">(
@@ -84,8 +85,6 @@ export function MultiStepPromptForm({
   const [variableValues, setVariableValues] = useState<VariableValues>({});
   const [globalVariableValues, setGlobalVariableValues] = useState<VariableValues>({});
 
-  const executePrompt = useAction(api.prompts.executePrompt);
-  
   // Get the prompt variant for the selected complexity
   const currentPromptVariant = useQuery(api.prompts.getPromptVariantsByTitle, {
     title: prompt.title,
@@ -314,33 +313,41 @@ export function MultiStepPromptForm({
     return true;
   };
 
-  const handleExecute = async () => {
+  const handleExecute = () => {
     setIsExecuting(true);
     setError(null);
-    setResult(null);
 
-    try {
-      // Create org profile from global variables
-      const orgProfile = {
+    const promptIdentifier = currentPromptVariant?._id ?? promptId;
+
+    const payload: PromptGenerationPayload = {
+      promptId: promptIdentifier,
+      basePromptId: promptId,
+      title: activePrompt.title,
+      outputDescription: activePrompt.outputDescription,
+      complexity: selectedComplexity,
+      situation: processedPrompt,
+      orgProfile: {
         name: globalVariableValues['ORGANIZATION_NAME'] || '',
         mission: globalVariableValues['MISSION_STATEMENT'] || '',
         tone: 'professional',
         region: globalVariableValues['REGION'] || '',
-        customFields: {}
-      };
+        customFields: {},
+      },
+      variableValues,
+      globalValues: globalVariableValues,
+      submittedAt: Date.now(),
+    };
 
-      const response = await executePrompt({
-        promptId: activePrompt._id || promptId,
-        situation: processedPrompt,
-        complexity: selectedComplexity,
-        orgProfile
-      });
+    try {
+      if (typeof window === "undefined") {
+        throw new Error("Session storage is not available in this environment.");
+      }
 
-      setResult(response.output);
-      setResultMetadata(response.metadata);
+      sessionStorage.setItem(GENERATION_STORAGE_KEY, JSON.stringify(payload));
+      router.push(`/prompt/${promptId}/generate`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred while executing the prompt.");
-    } finally {
+      console.error("Failed to start generation flow:", err);
+      setError("We couldn't start the generation. Please try again.");
       setIsExecuting(false);
     }
   };
@@ -372,32 +379,6 @@ export function MultiStepPromptForm({
       </div>
     );
   }
-
-  if (result) {
-    return (
-      <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
-        <div className="p-6">
-          <button
-            onClick={() => {
-              setResult(null);
-              setCurrentStep(0);
-              setComplexityChosen(false);
-            }}
-            className="mb-4 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
-          >
-            ← Start Over
-          </button>
-          <OutputViewer
-            content={result}
-            title={activePrompt.outputDescription || `Generated: ${activePrompt.title} (${selectedComplexity})`}
-            metadata={resultMetadata}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  const currentStepData = steps[currentStep - 1];
 
   return (
     <div className={`bg-white dark:bg-gray-800 min-h-screen ${className}`}>

@@ -59,6 +59,25 @@ export interface PromptExecutionForm {
   complexity?: "low" | "medium" | "high";
 }
 
+export interface PromptGenerationPayload {
+  promptId: Id<"prompts">;
+  basePromptId: Id<"prompts">;
+  title: string;
+  outputDescription?: string;
+  complexity: "low" | "medium" | "high";
+  situation: string;
+  orgProfile: {
+    name: string;
+    mission: string;
+    tone: string;
+    region: string;
+    customFields: Record<string, string>;
+  };
+  variableValues: Record<string, string>;
+  globalValues: Record<string, string>;
+  submittedAt: number;
+}
+
 export interface SearchFilters {
   category?: string;
   subcategory?: string;
@@ -87,6 +106,7 @@ export interface CategoryGridProps {
 // Constants
 export const COMPLEXITY_LEVELS = ['low', 'medium', 'high'] as const;
 export const OUTPUT_FORMATS = ['markdown', 'plaintext'] as const;
+export const GENERATION_STORAGE_KEY = 'haven.generatePayload' as const;
 
 export const TONE_OPTIONS = [
   'Professional',
