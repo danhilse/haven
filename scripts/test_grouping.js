@@ -123,9 +123,11 @@ Create user-friendly form questions for each variable. Return JSON:
 
 // Run if called directly
 if (require.main === module) {
-  // Set environment variables if not already set
+  // Check if environment variable is set
   if (!process.env.OPENAI_KEY) {
-    process.env.OPENAI_KEY = 'REDACTED_API_KEY';
+    console.error('❌ OPENAI_KEY environment variable is required');
+    console.error('   Please add OPENAI_KEY to your .env.local file');
+    process.exit(1);
   }
   
   testGroupingLogic().catch(error => {
