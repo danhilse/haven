@@ -572,10 +572,24 @@ export const semanticSearch = action({
       category: v.optional(v.string()),
       tags: v.optional(v.array(v.string())),
       intentType: v.string(),
-    })
+    }),
+    topPicks: v.array(v.object({
+      _id: v.id("prompts"),
+      _creationTime: v.number(),
+      title: v.string(),
+      description: v.string(),
+      outputDescription: v.optional(v.string()),
+      tags: v.array(v.string()),
+      category: v.string(),
+      subcategory: v.string(),
+      similarity: v.number(),
+      rank: v.number(),
+      reason: v.string(),
+      confidence: v.optional(v.string()),
+    }))
   }),
   handler: async (ctx, args) => {
-    const { parseSemanticQuery, generateEmbedding } = await import("../lib/openai");
+    const { parseSemanticQuery, generateEmbedding, rankSemanticCandidates } = await import("../lib/openai");
     
     // 1. Parse the semantic query using LLM
     const parsedQuery = await parseSemanticQuery(args.query);
@@ -616,11 +630,58 @@ export const semanticSearch = action({
     }
     
     // 5. Return results with similarity scores
-    const results = Array.from(uniquePrompts.values());
-    
+    const sortedResults = Array.from(uniquePrompts.values()).sort(
+      (a, b) => b.similarity - a.similarity
+    );
+
+    const candidatePool = sortedResults.slice(0, Math.min(sortedResults.length, 10));
+
+    const ranked = await rankSemanticCandidates({
+      userQuery: args.query,
+      parsedQuery,
+      candidates: candidatePool.map((candidate) => ({
+        id: String(candidate._id),
+        title: candidate.title,
+        description: candidate.description,
+        tags: candidate.tags,
+        category: candidate.category,
+        subcategory: candidate.subcategory,
+        similarity: candidate.similarity,
+      })),
+      maxRecommendations: 2,
+    });
+
+    const recommendationLookup = new Map(
+      ranked.recommendations.map((recommendation) => [
+        String(recommendation.promptId),
+        recommendation,
+      ])
+    );
+
+    const topPicks = sortedResults
+      .map((prompt) => {
+        const ranking = recommendationLookup.get(String(prompt._id));
+        if (!ranking) {
+          return null;
+        }
+        return {
+          ...prompt,
+          rank: ranking.rank,
+          reason: ranking.reason,
+          confidence: ranking.confidence,
+        };
+      })
+      .filter((prompt): prompt is typeof sortedResults[number] & {
+        rank: number;
+        reason: string;
+        confidence?: string;
+      } => Boolean(prompt))
+      .sort((a, b) => a.rank - b.rank);
+
     return {
-      results,
-      parsedQuery
+      results: sortedResults,
+      parsedQuery,
+      topPicks,
     };
   },
 });

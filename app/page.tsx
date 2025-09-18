@@ -14,6 +14,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [showAllResults, setShowAllResults] = useState(false);
   const categoryGridRef = useRef<StaticCategoryGridRef>(null);
   // Semantic search action
   const semanticSearch = useAction(api.prompts.semanticSearch);
@@ -35,11 +36,13 @@ export default function Home() {
     if (!query.trim()) {
       setSearchResults(null);
       setSearchQuery("");
+      setShowAllResults(false);
       return;
     }
 
     setSearchQuery(query);
     setIsSearching(true);
+    setShowAllResults(false);
 
     // Reset category grid to subcategories view when search is performed
     categoryGridRef.current?.resetToSubcategories();
@@ -54,7 +57,7 @@ export default function Home() {
         setSearchResults(results);
       } else {
         // Use regular search for shorter queries - results will come from useQuery
-        setSearchResults({ results: regularSearchResults || [] });
+        setSearchResults({ results: regularSearchResults || [], topPicks: [] });
       }
     } catch (error) {
       console.error("Search failed:", error);
@@ -72,9 +75,18 @@ export default function Home() {
     !isSearching
   ) {
     if (!searchResults || searchResults.results !== regularSearchResults) {
-      setSearchResults({ results: regularSearchResults });
+      setSearchResults({ results: regularSearchResults, topPicks: [] });
     }
   }
+
+  const allResults: any[] = searchResults?.results || [];
+  const highlightedResults: any[] = searchResults?.topPicks || [];
+  const hasTopPicks = highlightedResults.length > 0;
+  const topPickIds = new Set(highlightedResults.map((pick: any) => String(pick._id)));
+  const secondaryResults = hasTopPicks
+    ? allResults.filter((prompt: any) => !topPickIds.has(String(prompt._id)))
+    : allResults;
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero Section - Adaptive Height */}
@@ -112,14 +124,15 @@ export default function Home() {
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {isSearching
                     ? "Searching..."
-                    : searchResults.results?.length > 0
-                      ? `Found ${searchResults.results.length} result${searchResults.results.length === 1 ? "" : "s"}`
+                    : allResults.length > 0
+                      ? `Found ${allResults.length} result${allResults.length === 1 ? "" : "s"}`
                       : "No results found"}
                 </h2>
                 <button
                   onClick={() => {
                     setSearchResults(null);
                     setSearchQuery("");
+                    setShowAllResults(false);
                   }}
                   className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                 >
@@ -160,11 +173,68 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-            ) : searchResults.results?.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {searchResults.results.map((prompt: any) => (
-                  <PromptCard key={prompt._id} prompt={prompt} />
-                ))}
+            ) : allResults.length > 0 ? (
+              <div className="space-y-8">
+                {hasTopPicks && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      Recommended for this request
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {highlightedResults.map((pick: any) => (
+                        <div key={pick._id} className="space-y-3">
+                          <div className="flex items-baseline justify-between text-sm text-blue-600 dark:text-blue-400">
+                            <span className="font-medium">Top choice #{pick.rank}</span>
+                            {pick.confidence && (
+                              <span className="uppercase tracking-wide text-xs text-blue-500 dark:text-blue-300">
+                                {pick.confidence} confidence
+                              </span>
+                            )}
+                          </div>
+                          <PromptCard
+                            prompt={pick}
+                            className="border-2 border-blue-200/70 dark:border-blue-800"
+                          />
+                          {pick.reason && (
+                            <p className="text-sm text-gray-600 dark:text-gray-300">
+                              Why it helps: {pick.reason}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {hasTopPicks && secondaryResults.length > 0 && (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setShowAllResults((value) => !value)}
+                      className="inline-flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                    >
+                      {showAllResults
+                        ? "Hide additional matches"
+                        : `View all ${secondaryResults.length} matches`}
+                      <svg
+                        className={`ml-2 h-4 w-4 transition-transform ${showAllResults ? "rotate-180" : ""}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+
+                {(!hasTopPicks || (showAllResults && secondaryResults.length > 0)) && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {(hasTopPicks ? secondaryResults : allResults).map((prompt: any) => (
+                      <PromptCard key={prompt._id} prompt={prompt} />
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-center py-16">

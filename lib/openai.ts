@@ -39,6 +39,27 @@ export interface ParsedQuery {
   intentType: 'fundraising' | 'communication' | 'marketing' | 'advocacy' | 'volunteer' | 'general';
 }
 
+export interface SemanticCandidate {
+  id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  category: string;
+  subcategory: string;
+  similarity: number;
+}
+
+export interface RankedRecommendation {
+  promptId: string;
+  rank: number;
+  reason: string;
+  confidence?: 'high' | 'medium' | 'low';
+}
+
+export interface RankedRecommendationResponse {
+  recommendations: RankedRecommendation[];
+}
+
 // Different configs based on prompt complexity
 export const getGPT5Config = (complexity: string): GPT5Config => {
   switch (complexity) {
@@ -266,6 +287,151 @@ Focus on extracting the communication purpose, audience, and context.`;
       searchTerms: userQuery.split(' ').filter(word => word.length > 3).slice(0, 5),
       context: userQuery,
       intentType: 'general'
+    };
+  }
+}
+
+const FALLBACK_SUMMARY_LIMIT = 120;
+const FALLBACK_REASON_LIMIT = 160;
+
+function sanitizeReasonCopy(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/\btemplates?\b/gi, 'guidance')
+    .replace(/\bprompts?\b/gi, 'guidance')
+    .trim();
+}
+
+function buildFallbackReason(candidate: SemanticCandidate, requestSummary: string, isPrimary: boolean): string {
+  const summary = requestSummary.trim()
+    ? requestSummary.trim()
+    : `${candidate.category.toLowerCase()} support`;
+  const summarySnippet = summary.length > FALLBACK_SUMMARY_LIMIT
+    ? `${summary.slice(0, FALLBACK_SUMMARY_LIMIT - 1)}…`
+    : summary;
+
+  let description = candidate.description.trim();
+  if (!description) {
+    const tagPreview = candidate.tags.slice(0, 2).join(', ');
+    description = tagPreview
+      ? `covering ${tagPreview.toLowerCase()} guidance`
+      : `providing practical guidance`;
+  }
+
+  if (description.endsWith('.')) {
+    description = description.slice(0, -1);
+  }
+
+  if (description.length > FALLBACK_REASON_LIMIT) {
+    description = `${description.slice(0, FALLBACK_REASON_LIMIT - 1)}…`;
+  }
+
+  const descriptionFragment = description.charAt(0).toLowerCase() + description.slice(1);
+  const lead = isPrimary ? 'helps with' : 'also supports';
+
+  const reason = `${candidate.title} ${lead} "${summarySnippet}" by ${descriptionFragment}.`;
+  return sanitizeReasonCopy(reason);
+}
+
+export async function rankSemanticCandidates({
+  userQuery,
+  parsedQuery,
+  candidates,
+  maxRecommendations = 2,
+}: {
+  userQuery: string;
+  parsedQuery: ParsedQuery;
+  candidates: SemanticCandidate[];
+  maxRecommendations?: number;
+}): Promise<RankedRecommendationResponse> {
+  if (candidates.length === 0) {
+    return { recommendations: [] };
+  }
+
+  const systemPrompt = `You are an assistant that compares nonprofit support options to a user's request. Recommend the most helpful options with a single friendly sentence that explains how each one addresses the request. Never mention words like "template" or "prompt"—describe the guidance itself.`;
+
+  const payload = {
+    request: userQuery,
+    parsedContext: parsedQuery,
+    candidates: candidates.map((candidate) => ({
+      id: candidate.id,
+      title: candidate.title,
+      description: candidate.description,
+      tags: candidate.tags,
+      category: candidate.category,
+      subcategory: candidate.subcategory,
+      similarity: Number(candidate.similarity.toFixed(4)),
+    })),
+    maxRecommendations,
+  };
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          {
+            role: 'user',
+            content: `Compare the user request to the candidate options and return a JSON object with this shape:\n{\n  "recommendations": [\n    {\n      "promptId": "<id>",\n      "rank": <number>,\n      "reason": "<one sentence explaining how this guidance helps the request>",\n      "confidence": "high | medium | low"\n    }\n  ]\n}\n\nKeep each reason to a single sentence that references the user's request, sounds user-facing, and never mentions words such as template, prompt, or library.\n\nRequest and candidates (JSON):\n${JSON.stringify(payload)}`,
+          },
+        ],
+        max_tokens: 500,
+        temperature: 0.2,
+        response_format: { type: 'json_object' },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ranking API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+
+    if (!content) {
+      throw new Error('Ranking API returned empty content');
+    }
+
+    const parsed = JSON.parse(content);
+    const rawRecommendations = Array.isArray(parsed.recommendations)
+      ? parsed.recommendations
+      : [];
+
+    const sanitized: RankedRecommendation[] = rawRecommendations
+      .slice(0, maxRecommendations)
+      .map((recommendation: any, index: number) => ({
+        promptId: recommendation.promptId ?? recommendation.id,
+        rank: recommendation.rank ?? index + 1,
+        reason: sanitizeReasonCopy(
+          recommendation.reason ?? 'Recommended match based on semantic fit.'
+        ),
+        confidence: recommendation.confidence,
+      }))
+      .filter((recommendation: any) => Boolean(recommendation.promptId));
+
+    if (sanitized.length === 0) {
+      throw new Error('Ranking API returned no usable recommendations');
+    }
+
+    return { recommendations: sanitized };
+  } catch (error) {
+    console.error('Semantic ranking failed:', error);
+
+    return {
+      recommendations: candidates
+        .slice(0, maxRecommendations)
+        .map((candidate, index) => ({
+          promptId: candidate.id,
+          rank: index + 1,
+          reason: buildFallbackReason(candidate, parsedQuery.context || userQuery, index === 0),
+          confidence: 'medium',
+        })),
     };
   }
 }

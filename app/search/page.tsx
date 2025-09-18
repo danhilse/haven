@@ -206,6 +206,7 @@ function SearchContent() {
               query={currentQuery} 
               isSemanticSearch={isSemanticSearch && currentQuery.trim().length > 10}
               parsedQuery={semanticResults?.parsedQuery}
+              topPicks={semanticResults?.topPicks}
             />
           ) : (
             <div className="text-center py-16">
@@ -228,15 +229,28 @@ function SearchContent() {
   );
 }
 
-function SearchResults({ results, query, isSemanticSearch, parsedQuery }: { 
+function SearchResults({ results, query, isSemanticSearch, parsedQuery, topPicks }: { 
   results: any[] | undefined;
   query: string;
   isSemanticSearch?: boolean;
   parsedQuery?: any;
+  topPicks?: any[];
 }) {
+  const [showAll, setShowAll] = useState(false);
+
+  useEffect(() => {
+    setShowAll(false);
+  }, [query, isSemanticSearch]);
+
   if (results === undefined) {
     return <SearchResultsSkeleton />;
   }
+
+  const hasTopPicks = Boolean(isSemanticSearch && topPicks && topPicks.length > 0);
+  const topPickIds = new Set((topPicks || []).map((pick) => String(pick._id)));
+  const secondaryResults = hasTopPicks
+    ? results.filter((prompt) => !topPickIds.has(String(prompt._id)))
+    : results;
 
   return (
     <div>
@@ -258,7 +272,7 @@ function SearchResults({ results, query, isSemanticSearch, parsedQuery }: {
             </div>
           )}
         </div>
-        
+
         {parsedQuery && (
           <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
             <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
@@ -271,7 +285,7 @@ function SearchResults({ results, query, isSemanticSearch, parsedQuery }: {
             )}
           </div>
         )}
-        
+
         {results.length === 0 && (
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
             {isSemanticSearch 
@@ -282,9 +296,60 @@ function SearchResults({ results, query, isSemanticSearch, parsedQuery }: {
         )}
       </div>
 
-      {results.length > 0 && (
+      {hasTopPicks && (
+        <div className="space-y-4 mb-8">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+            Recommended for this request
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {(topPicks || []).map((pick) => (
+              <div key={pick._id} className="space-y-3">
+                <div className="flex items-baseline justify-between text-sm text-blue-600 dark:text-blue-400">
+                  <span className="font-medium">Top choice #{pick.rank}</span>
+                  {pick.confidence && (
+                    <span className="uppercase tracking-wide text-xs text-blue-500 dark:text-blue-300">
+                      {pick.confidence} confidence
+                    </span>
+                  )}
+                </div>
+                <PromptCard 
+                  prompt={pick} 
+                  className="border-2 border-blue-200/70 dark:border-blue-800"
+                />
+                {pick.reason && (
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    Why it helps: {pick.reason}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {hasTopPicks && secondaryResults.length > 0 && (
+        <div className="mb-6">
+          <button
+            type="button"
+            onClick={() => setShowAll((value) => !value)}
+            className="inline-flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+          >
+            {showAll ? 'Hide additional matches' : `View all ${secondaryResults.length} matches`}
+            <svg
+              className={`ml-2 h-4 w-4 transition-transform ${showAll ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {(!hasTopPicks || (showAll && secondaryResults.length > 0)) && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {results.map((prompt) => (
+          {(hasTopPicks ? secondaryResults : results).map((prompt) => (
             <PromptCard key={prompt._id} prompt={prompt} />
           ))}
         </div>
